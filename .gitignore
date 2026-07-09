@@ -1,0 +1,40 @@
+# Build output
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Logs
+logs/
+*.log
+
+# Local configuration
+config-local.properties
+config.properties
+credentials.json
+token.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+
+# Other
+*.swp
+*.swo
+*~
