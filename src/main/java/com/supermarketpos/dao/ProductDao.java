@@ -1,150 +1,232 @@
 package com.supermarketpos.dao;
 
-import com.supermarketpos.database.DatabaseInitializer;
 import com.supermarketpos.model.Product;
+import com.supermarketpos.util.DBConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public class ProductDao implements BaseDao<Product, Integer> {
+public class ProductDao {
 
-    private static final String FIND_BY_ID_SQL = "SELECT * FROM products WHERE id = ?";
-    private static final String FIND_ALL_SQL = "SELECT * FROM products";
-    private static final String COUNT_ACTIVE_SQL = "SELECT COUNT(*) FROM products WHERE is_active = TRUE";
-    private static final String COUNT_LOW_STOCK_SQL =
-            "SELECT COUNT(*) FROM products WHERE is_active = TRUE AND quantity_in_stock <= reorder_level";
-    private static final String INSERT_SQL =
-            "INSERT INTO products (name, sku, category_id, cost_price, selling_price, quantity_in_stock, reorder_level, is_active) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String UPDATE_SQL =
-            "UPDATE products SET name=?, sku=?, category_id=?, cost_price=?, selling_price=?, quantity_in_stock=?, reorder_level=?, is_active=? WHERE id=?";
-    private static final String SOFT_DELETE_SQL = "UPDATE products SET is_active = FALSE WHERE id = ?";
+    private static final String SELECT_BASE =
+            "SELECT p.*, c.name AS category_name FROM products p " +
+                    "JOIN categories c ON p.category_id = c.id ";
 
-    @Override
-    public Optional<Product> findById(Integer id) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(FIND_BY_ID_SQL)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to find product by id: " + id, e);
-        }
-    }
+    public int create(Product product) throws SQLException {
+        String sql = "INSERT INTO products " +
+                "(name, barcode, sku, category_id, cost_price, selling_price, gst_percentage, image_path, active) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-    @Override
-    public List<Product> findAll() {
-        List<Product> products = new ArrayList<>();
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(FIND_ALL_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                products.add(mapRow(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to fetch products", e);
-        }
-        return products;
-    }
-
-    public int countActive() {
-        return countWithQuery(COUNT_ACTIVE_SQL);
-    }
-
-    public int countLowStock() {
-        return countWithQuery(COUNT_LOW_STOCK_SQL);
-    }
-
-    private int countWithQuery(String sql) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            return rs.next() ? rs.getInt(1) : 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to run product count query", e);
-        }
-    }
-
-    @Override
-    public Product save(Product product) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            bindForWrite(ps, product);
+            bindProduct(ps, product);
             ps.executeUpdate();
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    product.setId(keys.getInt(1));
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
                 }
             }
-            return product;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to save product: " + product.getName(), e);
         }
+        return -1;
     }
 
-    @Override
-    public Product update(Product product) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
-            bindForWrite(ps, product);
+    public void update(Product product) throws SQLException {
+        String sql = "UPDATE products SET name = ?, barcode = ?, sku = ?, category_id = ?, " +
+                "cost_price = ?, selling_price = ?, gst_percentage = ?, image_path = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, product.getName());
+            ps.setString(2, product.getBarcode());
+            ps.setString(3, product.getSku());
+            ps.setInt(4, product.getCategoryId());
+            ps.setBigDecimal(5, product.getCostPrice());
+            ps.setBigDecimal(6, product.getSellingPrice());
+            ps.setBigDecimal(7, product.getGstPercentage());
+            ps.setString(8, product.getImagePath());
             ps.setInt(9, product.getId());
             ps.executeUpdate();
-            return product;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to update product: " + product.getId(), e);
         }
     }
 
-    @Override
-    public void delete(Integer id) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SOFT_DELETE_SQL)) {
-            ps.setInt(1, id);
+    public void setActiveStatus(int id, boolean active) throws SQLException {
+        String sql = "UPDATE products SET active = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setBoolean(1, active);
+            ps.setInt(2, id);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to deactivate product: " + id, e);
         }
     }
 
-    private void bindForWrite(PreparedStatement ps, Product p) throws SQLException {
-        ps.setString(1, p.getName());
-        ps.setString(2, p.getSku());
-        if (p.getCategoryId() != null) {
-            ps.setInt(3, p.getCategoryId());
-        } else {
-            ps.setNull(3, Types.INTEGER);
+    public Product findById(int id) throws SQLException {
+        String sql = SELECT_BASE + "WHERE p.id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
         }
-        ps.setDouble(4, p.getCostPrice());
-        ps.setDouble(5, p.getSellingPrice());
-        ps.setInt(6, p.getQuantityInStock());
-        ps.setInt(7, p.getReorderLevel());
-        ps.setBoolean(8, p.isActive());
+        return null;
+    }
+
+    public Product findByBarcode(String barcode) throws SQLException {
+        String sql = SELECT_BASE + "WHERE p.barcode = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, barcode);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Product findBySku(String sku) throws SQLException {
+        String sql = SELECT_BASE + "WHERE p.sku = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, sku);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean existsByBarcode(String barcode, Integer excludeId) throws SQLException {
+        String sql = excludeId == null
+                ? "SELECT COUNT(*) FROM products WHERE barcode = ?"
+                : "SELECT COUNT(*) FROM products WHERE barcode = ? AND id != ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, barcode);
+            if (excludeId != null) {
+                ps.setInt(2, excludeId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean existsBySku(String sku, Integer excludeId) throws SQLException {
+        String sql = excludeId == null
+                ? "SELECT COUNT(*) FROM products WHERE sku = ?"
+                : "SELECT COUNT(*) FROM products WHERE sku = ? AND id != ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, sku);
+            if (excludeId != null) {
+                ps.setInt(2, excludeId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public List<Product> findAll() throws SQLException {
+        String sql = SELECT_BASE + "ORDER BY p.name ASC";
+        List<Product> list = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+        }
+        return list;
+    }
+
+    public List<Product> findByCategory(int categoryId) throws SQLException {
+        String sql = SELECT_BASE + "WHERE p.category_id = ? ORDER BY p.name ASC";
+        List<Product> list = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, categoryId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    public List<Product> search(String keyword) throws SQLException {
+        String sql = SELECT_BASE +
+                "WHERE p.name LIKE ? OR p.barcode LIKE ? OR p.sku LIKE ? ORDER BY p.name ASC";
+        List<Product> list = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String like = "%" + keyword + "%";
+            ps.setString(1, like);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    private void bindProduct(PreparedStatement ps, Product product) throws SQLException {
+        ps.setString(1, product.getName());
+        ps.setString(2, product.getBarcode());
+        ps.setString(3, product.getSku());
+        ps.setInt(4, product.getCategoryId());
+        ps.setBigDecimal(5, product.getCostPrice());
+        ps.setBigDecimal(6, product.getSellingPrice());
+        ps.setBigDecimal(7, product.getGstPercentage());
+        ps.setString(8, product.getImagePath());
+        ps.setBoolean(9, product.isActive());
     }
 
     private Product mapRow(ResultSet rs) throws SQLException {
-        int categoryIdRaw = rs.getInt("category_id");
-        Integer categoryId = rs.wasNull() ? null : categoryIdRaw;
-        Timestamp createdTs = rs.getTimestamp("created_at");
-        return new Product(
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("sku"),
-                categoryId,
-                rs.getDouble("cost_price"),
-                rs.getDouble("selling_price"),
-                rs.getInt("quantity_in_stock"),
-                rs.getInt("reorder_level"),
-                rs.getBoolean("is_active"),
-                createdTs != null ? createdTs.toLocalDateTime() : null
-        );
+        Product p = new Product();
+        p.setId(rs.getInt("id"));
+        p.setName(rs.getString("name"));
+        p.setBarcode(rs.getString("barcode"));
+        p.setSku(rs.getString("sku"));
+        p.setCategoryId(rs.getInt("category_id"));
+        p.setCategoryName(rs.getString("category_name"));
+        p.setCostPrice(rs.getBigDecimal("cost_price"));
+        p.setSellingPrice(rs.getBigDecimal("selling_price"));
+        p.setGstPercentage(rs.getBigDecimal("gst_percentage"));
+        p.setImagePath(rs.getString("image_path"));
+        p.setActive(rs.getBoolean("active"));
+        Timestamp created = rs.getTimestamp("created_at");
+        Timestamp updated = rs.getTimestamp("updated_at");
+        if (created != null) p.setCreatedAt(created.toLocalDateTime());
+        if (updated != null) p.setUpdatedAt(updated.toLocalDateTime());
+        return p;
     }
 }

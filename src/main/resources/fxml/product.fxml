@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.supermarketpos.controller.ProductController"
+            stylesheets="@../css/common.css">
+
+    <top>
+        <ToolBar>
+            <items>
+                <TextField fx:id="searchField" promptText="Search by name / barcode / SKU..." onAction="#handleSearch"/>
+                <Button text="Search" onAction="#handleSearch"/>
+                <ComboBox fx:id="categoryDropdown" promptText="Filter by category" onAction="#handleFilterByCategory"/>
+            </items>
+        </ToolBar>
+    </top>
+
+    <center>
+        <TableView fx:id="productTable">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Name" prefWidth="160"/>
+                <TableColumn fx:id="barcodeColumn" text="Barcode" prefWidth="120"/>
+                <TableColumn fx:id="skuColumn" text="SKU" prefWidth="100"/>
+                <TableColumn fx:id="categoryColumn" text="Category" prefWidth="120"/>
+                <TableColumn fx:id="sellingPriceColumn" text="Selling Price" prefWidth="100"/>
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="90"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <right>
+        <VBox spacing="10" prefWidth="320">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Label text="Product Name:"/>
+            <TextField fx:id="nameField"/>
+
+            <Label text="Barcode:"/>
+            <HBox spacing="5">
+                <TextField fx:id="barcodeField" HBox.hgrow="ALWAYS"/>
+                <Button text="Generate" onAction="#handleGenerateBarcode"/>
+            </HBox>
+
+            <Label text="SKU:"/>
+            <TextField fx:id="skuField"/>
+
+            <Label text="Cost Price:"/>
+            <TextField fx:id="costPriceField"/>
+
+            <Label text="Selling Price:"/>
+            <TextField fx:id="sellingPriceField"/>
+
+            <Label text="GST Percentage:"/>
+            <TextField fx:id="gstField"/>
+
+            <ImageView fx:id="previewImage" fitWidth="150" fitHeight="150" preserveRatio="true"/>
+            <Button fx:id="uploadImageButton" text="Upload Image" onAction="#handleUploadImage"/>
+
+            <HBox spacing="10">
+                <Button fx:id="saveButton" text="Save" onAction="#handleSave"/>
+                <Button fx:id="updateButton" text="Update" onAction="#handleUpdate"/>
+                <Button fx:id="clearButton" text="Clear" onAction="#handleClear"/>
+            </HBox>
+            <HBox spacing="10">
+                <Button fx:id="activateButton" text="Activate" onAction="#handleActivate"/>
+                <Button fx:id="deactivateButton" text="Deactivate" onAction="#handleDeactivate"/>
+            </HBox>
+        </VBox>
+    </right>
+
+</BorderPane>
