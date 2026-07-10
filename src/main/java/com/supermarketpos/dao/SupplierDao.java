@@ -1,121 +1,203 @@
 package com.supermarketpos.dao;
 
-import com.supermarketpos.database.DatabaseInitializer;
 import com.supermarketpos.model.Supplier;
+import com.supermarketpos.util.DBConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public class SupplierDao implements BaseDao<Supplier, Integer> {
+public class SupplierDao {
 
-    private static final String FIND_BY_ID_SQL = "SELECT * FROM suppliers WHERE id = ?";
-    private static final String FIND_ALL_SQL = "SELECT * FROM suppliers";
-    private static final String COUNT_ACTIVE_SQL = "SELECT COUNT(*) FROM suppliers WHERE is_active = TRUE";
-    private static final String INSERT_SQL = "INSERT INTO suppliers (name, phone, email, is_active) VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE suppliers SET name=?, phone=?, email=?, is_active=? WHERE id=?";
-    private static final String SOFT_DELETE_SQL = "UPDATE suppliers SET is_active = FALSE WHERE id = ?";
+    public int create(Supplier supplier) throws SQLException {
+        String sql = "INSERT INTO suppliers " +
+                "(supplier_code, supplier_name, contact_person, mobile, email, gst_number, " +
+                "address, city, state, pincode, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-    @Override
-    public Optional<Supplier> findById(Integer id) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(FIND_BY_ID_SQL)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to find supplier by id: " + id, e);
-        }
-    }
-
-    @Override
-    public List<Supplier> findAll() {
-        List<Supplier> suppliers = new ArrayList<>();
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(FIND_ALL_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                suppliers.add(mapRow(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to fetch suppliers", e);
-        }
-        return suppliers;
-    }
-
-    public int countActive() {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(COUNT_ACTIVE_SQL);
-             ResultSet rs = ps.executeQuery()) {
-            return rs.next() ? rs.getInt(1) : 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to count active suppliers", e);
-        }
-    }
-
-    @Override
-    public Supplier save(Supplier supplier) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, supplier.getName());
-            ps.setString(2, supplier.getPhone());
-            ps.setString(3, supplier.getEmail());
-            ps.setBoolean(4, supplier.isActive());
+            bindSupplier(ps, supplier);
             ps.executeUpdate();
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    supplier.setId(keys.getInt(1));
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
                 }
             }
-            return supplier;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to save supplier: " + supplier.getName(), e);
         }
+        return -1;
     }
 
-    @Override
-    public Supplier update(Supplier supplier) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
-            ps.setString(1, supplier.getName());
-            ps.setString(2, supplier.getPhone());
-            ps.setString(3, supplier.getEmail());
-            ps.setBoolean(4, supplier.isActive());
-            ps.setInt(5, supplier.getId());
+    public void update(Supplier supplier) throws SQLException {
+        String sql = "UPDATE suppliers SET supplier_code = ?, supplier_name = ?, contact_person = ?, " +
+                "mobile = ?, email = ?, gst_number = ?, address = ?, city = ?, state = ?, pincode = ? " +
+                "WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, supplier.getSupplierCode());
+            ps.setString(2, supplier.getSupplierName());
+            ps.setString(3, supplier.getContactPerson());
+            ps.setString(4, supplier.getMobile());
+            ps.setString(5, supplier.getEmail());
+            ps.setString(6, supplier.getGstNumber());
+            ps.setString(7, supplier.getAddress());
+            ps.setString(8, supplier.getCity());
+            ps.setString(9, supplier.getState());
+            ps.setString(10, supplier.getPincode());
+            ps.setInt(11, supplier.getId());
             ps.executeUpdate();
-            return supplier;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to update supplier: " + supplier.getId(), e);
         }
     }
 
-    @Override
-    public void delete(Integer id) {
-        try (Connection conn = DatabaseInitializer.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SOFT_DELETE_SQL)) {
+    public void setActiveStatus(int id, boolean active) throws SQLException {
+        String sql = "UPDATE suppliers SET active = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setBoolean(1, active);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        }
+    }
+
+    public Supplier findById(int id) throws SQLException {
+        String sql = "SELECT * FROM suppliers WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to deactivate supplier: " + id, e);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
         }
+        return null;
+    }
+
+    public boolean existsByCode(String supplierCode, Integer excludeId) throws SQLException {
+        String sql = excludeId == null
+                ? "SELECT COUNT(*) FROM suppliers WHERE LOWER(supplier_code) = LOWER(?)"
+                : "SELECT COUNT(*) FROM suppliers WHERE LOWER(supplier_code) = LOWER(?) AND id != ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, supplierCode);
+            if (excludeId != null) {
+                ps.setInt(2, excludeId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean existsByName(String supplierName, Integer excludeId) throws SQLException {
+        String sql = excludeId == null
+                ? "SELECT COUNT(*) FROM suppliers WHERE LOWER(supplier_name) = LOWER(?)"
+                : "SELECT COUNT(*) FROM suppliers WHERE LOWER(supplier_name) = LOWER(?) AND id != ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, supplierName);
+            if (excludeId != null) {
+                ps.setInt(2, excludeId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public List<Supplier> findAll() throws SQLException {
+        String sql = "SELECT * FROM suppliers ORDER BY supplier_name ASC";
+        List<Supplier> list = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+        }
+        return list;
+    }
+
+    public List<Supplier> findByStatus(boolean active) throws SQLException {
+        String sql = "SELECT * FROM suppliers WHERE active = ? ORDER BY supplier_name ASC";
+        List<Supplier> list = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setBoolean(1, active);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    public List<Supplier> search(String keyword) throws SQLException {
+        String sql = "SELECT * FROM suppliers WHERE supplier_name LIKE ? OR supplier_code LIKE ? " +
+                "OR mobile LIKE ? ORDER BY supplier_name ASC";
+        List<Supplier> list = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String like = "%" + keyword + "%";
+            ps.setString(1, like);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    private void bindSupplier(PreparedStatement ps, Supplier supplier) throws SQLException {
+        ps.setString(1, supplier.getSupplierCode());
+        ps.setString(2, supplier.getSupplierName());
+        ps.setString(3, supplier.getContactPerson());
+        ps.setString(4, supplier.getMobile());
+        ps.setString(5, supplier.getEmail());
+        ps.setString(6, supplier.getGstNumber());
+        ps.setString(7, supplier.getAddress());
+        ps.setString(8, supplier.getCity());
+        ps.setString(9, supplier.getState());
+        ps.setString(10, supplier.getPincode());
+        ps.setBoolean(11, supplier.isActive());
     }
 
     private Supplier mapRow(ResultSet rs) throws SQLException {
-        Timestamp createdTs = rs.getTimestamp("created_at");
-        return new Supplier(
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("phone"),
-                rs.getString("email"),
-                rs.getBoolean("is_active"),
-                createdTs != null ? createdTs.toLocalDateTime() : null
-        );
+        Supplier s = new Supplier();
+        s.setId(rs.getInt("id"));
+        s.setSupplierCode(rs.getString("supplier_code"));
+        s.setSupplierName(rs.getString("supplier_name"));
+        s.setContactPerson(rs.getString("contact_person"));
+        s.setMobile(rs.getString("mobile"));
+        s.setEmail(rs.getString("email"));
+        s.setGstNumber(rs.getString("gst_number"));
+        s.setAddress(rs.getString("address"));
+        s.setCity(rs.getString("city"));
+        s.setState(rs.getString("state"));
+        s.setPincode(rs.getString("pincode"));
+        s.setActive(rs.getBoolean("active"));
+        Timestamp created = rs.getTimestamp("created_at");
+        Timestamp updated = rs.getTimestamp("updated_at");
+        if (created != null) s.setCreatedAt(created.toLocalDateTime());
+        if (updated != null) s.setUpdatedAt(updated.toLocalDateTime());
+        return s;
     }
 }

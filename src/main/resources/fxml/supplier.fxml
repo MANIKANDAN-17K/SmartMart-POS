@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.supermarketpos.controller.SupplierController"
+            stylesheets="@../css/common.css">
+
+    <top>
+        <ToolBar>
+            <items>
+                <TextField fx:id="searchField" promptText="Search by name / code / mobile..." onAction="#handleSearch"/>
+                <Button text="Search" onAction="#handleSearch"/>
+                <Label text="Status:"/>
+                <ComboBox fx:id="statusFilter" onAction="#handleStatusFilterChange"/>
+                <Button fx:id="refreshButton" text="Refresh" onAction="#handleRefresh"/>
+            </items>
+        </ToolBar>
+    </top>
+
+    <center>
+        <TableView fx:id="supplierTable">
+            <columns>
+                <TableColumn fx:id="codeColumn" text="Supplier Code" prefWidth="110"/>
+                <TableColumn fx:id="nameColumn" text="Supplier Name" prefWidth="160"/>
+                <TableColumn fx:id="contactColumn" text="Contact Person" prefWidth="140"/>
+                <TableColumn fx:id="mobileColumn" text="Mobile" prefWidth="110"/>
+                <TableColumn fx:id="emailColumn" text="Email" prefWidth="160"/>
+                <TableColumn fx:id="cityColumn" text="City" prefWidth="100"/>
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="90"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <right>
+        <VBox spacing="8" prefWidth="320">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Label text="Supplier Code:"/>
+            <TextField fx:id="codeField"/>
+
+            <Label text="Supplier Name:"/>
+            <TextField fx:id="nameField"/>
+
+            <Label text="Contact Person:"/>
+            <TextField fx:id="contactPersonField"/>
+
+            <Label text="Mobile Number:"/>
+            <TextField fx:id="mobileField"/>
+
+            <Label text="Email:"/>
+            <TextField fx:id="emailField"/>
+
+            <Label text="GST Number:"/>
+            <TextField fx:id="gstField"/>
+
+            <Label text="Address:"/>
+            <TextArea fx:id="addressField" prefRowCount="2"/>
+
+            <HBox spacing="8">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="City:"/>
+                    <TextField fx:id="cityField"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="State:"/>
+                    <TextField fx:id="stateField"/>
+                </VBox>
+            </HBox>
+
+            <Label text="Pincode:"/>
+            <TextField fx:id="pincodeField"/>
+
+            <HBox spacing="10">
+                <Button fx:id="addButton" text="Add" onAction="#handleAdd"/>
+                <Button fx:id="updateButton" text="Update" onAction="#handleUpdate"/>
+                <Button fx:id="clearButton" text="Clear" onAction="#handleClear"/>
+            </HBox>
+            <HBox spacing="10">
+                <Button fx:id="activateButton" text="Activate" onAction="#handleActivate"/>
+                <Button fx:id="deactivateButton" text="Deactivate" onAction="#handleDeactivate"/>
+            </HBox>
+            <Button fx:id="purchaseHistoryButton" text="View Purchase History" onAction="#handlePurchaseHistory" maxWidth="Infinity"/>
+        </VBox>
+    </right>
+
+</BorderPane>

@@ -1,5 +1,7 @@
 package com.supermarketpos.util;
 
+import static com.mysql.cj.util.StringUtils.isNullOrEmpty;
+
 public final class ValidationUtil {
 
     private static final int MAX_USERNAME_LENGTH = 50;
@@ -66,6 +68,28 @@ public final class ValidationUtil {
 
         public String getMessage() {
             return message;
+        }
+        private static final java.util.regex.Pattern EMAIL_PATTERN =
+                java.util.regex.Pattern.compile("^[\\w.+\\-]+@[\\w\\-]+\\.[a-zA-Z]{2,}$");
+
+        private static final java.util.regex.Pattern MOBILE_PATTERN =
+                java.util.regex.Pattern.compile("^[6-9]\\d{9}$");
+
+        private static final java.util.regex.Pattern GST_PATTERN =
+                java.util.regex.Pattern.compile("^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$");
+
+        public static boolean isValidEmail(String email) {
+            if (isNullOrEmpty(email)) return true; // optional field
+            return EMAIL_PATTERN.matcher(email.trim()).matches();
+        }
+
+        public static boolean isValidMobile(String mobile) {
+            return !isNullOrEmpty(mobile) && MOBILE_PATTERN.matcher(mobile.trim()).matches();
+        }
+
+        public static boolean isValidGstNumber(String gstNumber) {
+            if (isNullOrEmpty(gstNumber)) return true; // optional field
+            return GST_PATTERN.matcher(gstNumber.trim().toUpperCase()).matches();
         }
     }
 }
