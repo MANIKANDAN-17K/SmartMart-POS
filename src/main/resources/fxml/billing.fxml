@@ -13,6 +13,7 @@
     <top>
         <HBox styleClass="header-bar" spacing="20" alignment="CENTER_LEFT">
             <Label text="SmartMart POS" styleClass="logo-text"/>
+            <Button text="Dashboard" styleClass="btn-secondary" onAction="#onBackToDashboard"/>
             <Region HBox.hgrow="ALWAYS"/>
             <VBox alignment="CENTER">
                 <Label text="Invoice" styleClass="label-muted"/>
@@ -87,6 +88,7 @@
                     <Label text="Bill Summary" styleClass="section-title"/>
                     <HBox><Label text="Items" HBox.hgrow="ALWAYS"/><Label fx:id="lblItemCount" text="0"/></HBox>
                     <HBox><Label text="Subtotal" HBox.hgrow="ALWAYS"/><Label fx:id="lblSubtotal" text="₹0.00"/></HBox>
+                    <HBox><Label text="Discount" HBox.hgrow="ALWAYS"/><Label fx:id="lblDiscount" text="₹0.00"/></HBox>
                     <HBox spacing="6">
                         <Label text="Bill Discount (₹)" HBox.hgrow="ALWAYS"/>
                         <TextField fx:id="tfBillDiscount" prefWidth="80" promptText="0.00"/>

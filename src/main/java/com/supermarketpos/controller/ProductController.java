@@ -27,30 +27,52 @@ import java.util.List;
 
 public class ProductController {
 
-    @FXML private TextField nameField;
-    @FXML private TextField barcodeField;
-    @FXML private TextField skuField;
-    @FXML private ComboBox<Category> categoryDropdown;
-    @FXML private TextField costPriceField;
-    @FXML private TextField sellingPriceField;
-    @FXML private TextField gstField;
-    @FXML private ImageView previewImage;
-    @FXML private TextField searchField;
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField barcodeField;
+    @FXML
+    private TextField skuField;
+    @FXML
+    private ComboBox<Category> categoryDropdown;
+    @FXML
+    private TextField costPriceField;
+    @FXML
+    private TextField sellingPriceField;
+    @FXML
+    private TextField gstField;
+    @FXML
+    private ImageView previewImage;
+    @FXML
+    private TextField searchField;
 
-    @FXML private TableView<Product> productTable;
-    @FXML private TableColumn<Product, String> nameColumn;
-    @FXML private TableColumn<Product, String> barcodeColumn;
-    @FXML private TableColumn<Product, String> skuColumn;
-    @FXML private TableColumn<Product, String> categoryColumn;
-    @FXML private TableColumn<Product, BigDecimal> sellingPriceColumn;
-    @FXML private TableColumn<Product, String> statusColumn;
+    @FXML
+    private TableView<Product> productTable;
+    @FXML
+    private TableColumn<Product, String> nameColumn;
+    @FXML
+    private TableColumn<Product, String> barcodeColumn;
+    @FXML
+    private TableColumn<Product, String> skuColumn;
+    @FXML
+    private TableColumn<Product, String> categoryColumn;
+    @FXML
+    private TableColumn<Product, BigDecimal> sellingPriceColumn;
+    @FXML
+    private TableColumn<Product, String> statusColumn;
 
-    @FXML private Button saveButton;
-    @FXML private Button updateButton;
-    @FXML private Button clearButton;
-    @FXML private Button uploadImageButton;
-    @FXML private Button activateButton;
-    @FXML private Button deactivateButton;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button updateButton;
+    @FXML
+    private Button clearButton;
+    @FXML
+    private Button uploadImageButton;
+    @FXML
+    private Button activateButton;
+    @FXML
+    private Button deactivateButton;
 
     private final ProductService productService = new ProductService();
     private final CategoryService categoryService = new CategoryService();
@@ -110,7 +132,8 @@ public class ProductController {
 
         Window window = uploadImageButton.getScene().getWindow();
         File file = fileChooser.showOpenDialog(window);
-        if (file == null) return;
+        if (file == null)
+            return;
 
         try {
             String storedPath = ImageUtil.storeProductImage(file.toPath());
@@ -204,7 +227,8 @@ public class ProductController {
         }
         boolean confirmed = AlertUtil.showConfirmation("Confirm Deactivation",
                 "Inactive products will no longer appear in Billing. Continue?");
-        if (!confirmed) return;
+        if (!confirmed)
+            return;
 
         try {
             productService.deactivateProduct(selectedProduct.getId());
@@ -292,5 +316,19 @@ public class ProductController {
             return null;
         }
         return new BigDecimal(value.trim());
+    }
+
+    @FXML
+    private void handleBackToDashboard() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/dashboard.fxml"));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) nameField.getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Dashboard");
+        } catch (java.io.IOException e) {
+            AlertUtil.showError("Navigation Error", "Could not load Dashboard.");
+        }
     }
 }

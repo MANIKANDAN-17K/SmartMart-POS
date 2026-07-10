@@ -13,6 +13,8 @@
     <top>
         <ToolBar>
             <items>
+                <Button text="Dashboard" onAction="#handleBackToDashboard"/>
+                <Separator/>
                 <TextField fx:id="searchField" promptText="Search by name / barcode / SKU..." onAction="#handleSearch"/>
                 <Button text="Search" onAction="#handleSearch"/>
                 <ComboBox fx:id="categoryDropdown" promptText="Filter by category" onAction="#handleFilterByCategory"/>

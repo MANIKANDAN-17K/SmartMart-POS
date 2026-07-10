@@ -29,42 +29,70 @@ public class ReportController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(ReportController.class.getName());
 
     // ── Report type selector ──────────────────────────────────────
-    @FXML private ComboBox<String> cmbReportType;
+    @FXML
+    private ComboBox<String> cmbReportType;
 
     // ── Filter panel ─────────────────────────────────────────────
-    @FXML private DatePicker dpStartDate;
-    @FXML private DatePicker dpEndDate;
-    @FXML private DatePicker dpSingleDate;
-    @FXML private ComboBox<String> cmbMonth;
-    @FXML private ComboBox<Integer> cmbYear;
-    @FXML private ComboBox<String> cmbCategory;
-    @FXML private ComboBox<String> cmbSupplier;
-    @FXML private ComboBox<String> cmbStockStatus;
-    @FXML private TextField txtProductSearch;
-    @FXML private TextField txtSearch;
+    @FXML
+    private DatePicker dpStartDate;
+    @FXML
+    private DatePicker dpEndDate;
+    @FXML
+    private DatePicker dpSingleDate;
+    @FXML
+    private ComboBox<String> cmbMonth;
+    @FXML
+    private ComboBox<Integer> cmbYear;
+    @FXML
+    private ComboBox<String> cmbCategory;
+    @FXML
+    private ComboBox<String> cmbSupplier;
+    @FXML
+    private ComboBox<String> cmbStockStatus;
+    @FXML
+    private TextField txtProductSearch;
+    @FXML
+    private TextField txtSearch;
 
     // ── Summary cards ─────────────────────────────────────────────
-    @FXML private Label lblCard1Title;
-    @FXML private Label lblCard1Value;
-    @FXML private Label lblCard2Title;
-    @FXML private Label lblCard2Value;
-    @FXML private Label lblCard3Title;
-    @FXML private Label lblCard3Value;
-    @FXML private Label lblCard4Title;
-    @FXML private Label lblCard4Value;
-    @FXML private Label lblCard5Title;
-    @FXML private Label lblCard5Value;
+    @FXML
+    private Label lblCard1Title;
+    @FXML
+    private Label lblCard1Value;
+    @FXML
+    private Label lblCard2Title;
+    @FXML
+    private Label lblCard2Value;
+    @FXML
+    private Label lblCard3Title;
+    @FXML
+    private Label lblCard3Value;
+    @FXML
+    private Label lblCard4Title;
+    @FXML
+    private Label lblCard4Value;
+    @FXML
+    private Label lblCard5Title;
+    @FXML
+    private Label lblCard5Value;
 
     // ── Report table ──────────────────────────────────────────────
-    @FXML private TableView<ObservableList<String>> tblReport;
-    @FXML private VBox reportContainer;
+    @FXML
+    private TableView<ObservableList<String>> tblReport;
+    @FXML
+    private VBox reportContainer;
 
     // ── Toolbar buttons ───────────────────────────────────────────
-    @FXML private Button btnGenerate;
-    @FXML private Button btnExportExcel;
-    @FXML private Button btnPrint;
-    @FXML private Button btnRefresh;
-    @FXML private Button btnClearFilters;
+    @FXML
+    private Button btnGenerate;
+    @FXML
+    private Button btnExportExcel;
+    @FXML
+    private Button btnPrint;
+    @FXML
+    private Button btnRefresh;
+    @FXML
+    private Button btnClearFilters;
 
     private final ReportService reportService = new ReportService();
     private String currentReportType = "";
@@ -90,22 +118,23 @@ public class ReportController implements Initializable {
                 "Product Sales Report",
                 "Purchase Report",
                 "Profit Report",
-                "Stock Report"
-        ));
+                "Stock Report"));
         cmbReportType.setOnAction(e -> onReportTypeChanged());
     }
 
     private void setupYearCombo() {
         ObservableList<Integer> years = FXCollections.observableArrayList();
         int thisYear = LocalDate.now().getYear();
-        for (int y = thisYear; y >= thisYear - 5; y--) years.add(y);
+        for (int y = thisYear; y >= thisYear - 5; y--)
+            years.add(y);
         cmbYear.setItems(years);
         cmbYear.getSelectionModel().selectFirst();
     }
 
     private void setupMonthCombo() {
         ObservableList<String> months = FXCollections.observableArrayList();
-        for (Month m : Month.values()) months.add(m.name());
+        for (Month m : Month.values())
+            months.add(m.name());
         cmbMonth.setItems(months);
         cmbMonth.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
     }
@@ -131,7 +160,8 @@ public class ReportController implements Initializable {
 
     private void onReportTypeChanged() {
         String type = cmbReportType.getValue();
-        if (type == null) return;
+        if (type == null)
+            return;
 
         // Hide all filters first
         setVisible(dpSingleDate, false);
@@ -146,16 +176,29 @@ public class ReportController implements Initializable {
 
         switch (type) {
             case "Daily Sales Report" -> setVisible(dpSingleDate, true);
-            case "Monthly Sales Report" -> { setVisible(cmbMonth, true); setVisible(cmbYear, true); }
+            case "Monthly Sales Report" -> {
+                setVisible(cmbMonth, true);
+                setVisible(cmbYear, true);
+            }
             case "Product Sales Report" -> {
-                setVisible(dpStartDate, true); setVisible(dpEndDate, true);
-                setVisible(cmbCategory, true); setVisible(txtProductSearch, true);
+                setVisible(dpStartDate, true);
+                setVisible(dpEndDate, true);
+                setVisible(cmbCategory, true);
+                setVisible(txtProductSearch, true);
             }
             case "Purchase Report" -> {
-                setVisible(dpStartDate, true); setVisible(dpEndDate, true); setVisible(cmbSupplier, true);
+                setVisible(dpStartDate, true);
+                setVisible(dpEndDate, true);
+                setVisible(cmbSupplier, true);
             }
-            case "Profit Report" -> { setVisible(dpStartDate, true); setVisible(dpEndDate, true); }
-            case "Stock Report" -> { setVisible(cmbCategory, true); setVisible(cmbStockStatus, true); }
+            case "Profit Report" -> {
+                setVisible(dpStartDate, true);
+                setVisible(dpEndDate, true);
+            }
+            case "Stock Report" -> {
+                setVisible(cmbCategory, true);
+                setVisible(cmbStockStatus, true);
+            }
         }
 
         clearTable();
@@ -205,15 +248,15 @@ public class ReportController implements Initializable {
         showSummaryCard(2, "Total GST", CurrencyUtil.format(r.getTotalGst()));
         showSummaryCard(3, "Total Discount", CurrencyUtil.format(r.getTotalDiscount()));
         showSummaryCard(4, "Avg Bill Value", CurrencyUtil.format(r.getAverageBillValue()));
-        buildTable(new String[]{"Date", "Total Bills", "Total Sales", "Total GST", "Total Discount", "Avg Bill Value"},
+        buildTable(
+                new String[] { "Date", "Total Bills", "Total Sales", "Total GST", "Total Discount", "Avg Bill Value" },
                 List.of(FXCollections.observableArrayList(
                         DateUtil.format(r.getDate()),
                         String.valueOf(r.getTotalBills()),
                         CurrencyUtil.format(r.getTotalSales()),
                         CurrencyUtil.format(r.getTotalGst()),
                         CurrencyUtil.format(r.getTotalDiscount()),
-                        CurrencyUtil.format(r.getAverageBillValue())
-                )));
+                        CurrencyUtil.format(r.getAverageBillValue()))));
     }
 
     private void generateMonthlySales() {
@@ -225,20 +268,20 @@ public class ReportController implements Initializable {
         showSummaryCard(1, "Total Bills", String.valueOf(r.getTotalBills()));
         showSummaryCard(2, "Avg Daily Sales", CurrencyUtil.format(r.getAverageDailySales()));
         hideSummaryCards(3, 4);
-        buildTable(new String[]{"Month", "Year", "Total Revenue", "Total Bills", "Avg Daily Sales"},
+        buildTable(new String[] { "Month", "Year", "Total Revenue", "Total Bills", "Avg Daily Sales" },
                 List.of(FXCollections.observableArrayList(
                         cmbMonth.getValue(), String.valueOf(year),
                         CurrencyUtil.format(r.getTotalRevenue()),
                         String.valueOf(r.getTotalBills()),
-                        CurrencyUtil.format(r.getAverageDailySales())
-                )));
+                        CurrencyUtil.format(r.getAverageDailySales()))));
     }
 
     private void generateProductSales() {
         LocalDate start = dpStartDate.getValue() != null ? dpStartDate.getValue() : LocalDate.now().withDayOfMonth(1);
         LocalDate end = dpEndDate.getValue() != null ? dpEndDate.getValue() : LocalDate.now();
         if (!ValidationUtil.isValidDateRange(start, end)) {
-            AlertUtil.showWarning("Invalid Date Range", "Start date cannot be after end date."); return;
+            AlertUtil.showWarning("Invalid Date Range", "Start date cannot be after end date.");
+            return;
         }
         String cat = cmbCategory.getValue();
         String prod = txtProductSearch.getText();
@@ -256,14 +299,15 @@ public class ReportController implements Initializable {
                     String.valueOf(r.getProductId()), r.getProductName(), r.getCategory(),
                     String.valueOf(r.getQuantitySold()), CurrencyUtil.format(r.getRevenue())));
         }
-        buildTable(new String[]{"Product ID", "Product Name", "Category", "Qty Sold", "Revenue"}, rows);
+        buildTable(new String[] { "Product ID", "Product Name", "Category", "Qty Sold", "Revenue" }, rows);
     }
 
     private void generatePurchaseReport() {
         LocalDate start = dpStartDate.getValue() != null ? dpStartDate.getValue() : LocalDate.now().withDayOfMonth(1);
         LocalDate end = dpEndDate.getValue() != null ? dpEndDate.getValue() : LocalDate.now();
         if (!ValidationUtil.isValidDateRange(start, end)) {
-            AlertUtil.showWarning("Invalid Date Range", "Start date cannot be after end date."); return;
+            AlertUtil.showWarning("Invalid Date Range", "Start date cannot be after end date.");
+            return;
         }
         String supplier = cmbSupplier.getValue();
         List<PurchaseReport> list = reportService.getPurchaseReport(start, end, supplier);
@@ -279,14 +323,15 @@ public class ReportController implements Initializable {
                     r.getSupplierName(), r.getProductName(),
                     String.valueOf(r.getQuantity()), CurrencyUtil.format(r.getPurchaseAmount())));
         }
-        buildTable(new String[]{"Purchase ID", "Date", "Supplier", "Product", "Qty", "Amount"}, rows);
+        buildTable(new String[] { "Purchase ID", "Date", "Supplier", "Product", "Qty", "Amount" }, rows);
     }
 
     private void generateProfitReport() {
         LocalDate start = dpStartDate.getValue() != null ? dpStartDate.getValue() : LocalDate.now().withDayOfMonth(1);
         LocalDate end = dpEndDate.getValue() != null ? dpEndDate.getValue() : LocalDate.now();
         if (!ValidationUtil.isValidDateRange(start, end)) {
-            AlertUtil.showWarning("Invalid Date Range", "Start date cannot be after end date."); return;
+            AlertUtil.showWarning("Invalid Date Range", "Start date cannot be after end date.");
+            return;
         }
         List<ProfitReport> list = reportService.getProfitReport(start, end);
         currentReportData = list;
@@ -306,7 +351,7 @@ public class ReportController implements Initializable {
                     CurrencyUtil.format(r.getCost()), CurrencyUtil.format(r.getGrossProfit()),
                     String.format("%.2f%%", r.getProfitPercentage())));
         }
-        buildTable(new String[]{"Date", "Revenue", "Cost", "Gross Profit", "Profit %"}, rows);
+        buildTable(new String[] { "Date", "Revenue", "Cost", "Gross Profit", "Profit %" }, rows);
     }
 
     private void generateStockReport() {
@@ -316,7 +361,7 @@ public class ReportController implements Initializable {
         currentReportData = list;
         long outCount = list.stream().filter(r -> "OUT".equals(r.getStockStatus())).count();
         long lowCount = list.stream().filter(r -> "LOW".equals(r.getStockStatus())).count();
-        long okCount  = list.stream().filter(r -> "OK".equals(r.getStockStatus())).count();
+        long okCount = list.stream().filter(r -> "OK".equals(r.getStockStatus())).count();
         showSummaryCard(0, "Total Products", String.valueOf(list.size()));
         showSummaryCard(1, "OK Stock", String.valueOf(okCount));
         showSummaryCard(2, "Low Stock", String.valueOf(lowCount));
@@ -328,7 +373,9 @@ public class ReportController implements Initializable {
                     String.valueOf(r.getProductId()), r.getProductName(), r.getCategory(),
                     String.valueOf(r.getCurrentStock()), String.valueOf(r.getReorderLevel()), r.getStockStatus()));
         }
-        buildTable(new String[]{"Product ID", "Product Name", "Category", "Current Stock", "Reorder Level", "Status"}, rows);
+        buildTable(
+                new String[] { "Product ID", "Product Name", "Category", "Current Stock", "Reorder Level", "Status" },
+                rows);
     }
 
     // ── Table builder ─────────────────────────────────────────────
@@ -350,7 +397,8 @@ public class ReportController implements Initializable {
         if (txtSearch != null) {
             txtSearch.textProperty().addListener((obs, oldVal, newVal) -> {
                 filtered.setPredicate(row -> {
-                    if (newVal == null || newVal.isBlank()) return true;
+                    if (newVal == null || newVal.isBlank())
+                        return true;
                     String lower = newVal.toLowerCase();
                     return row.stream().anyMatch(cell -> cell.toLowerCase().contains(lower));
                 });
@@ -370,19 +418,25 @@ public class ReportController implements Initializable {
 
     // ── Summary cards helpers ─────────────────────────────────────
 
-    private final Label[] cardTitles  = new Label[5];
-    private final Label[] cardValues  = new Label[5];
+    private final Label[] cardTitles = new Label[5];
+    private final Label[] cardValues = new Label[5];
 
     private void linkCardLabels() {
-        cardTitles[0] = lblCard1Title; cardValues[0] = lblCard1Value;
-        cardTitles[1] = lblCard2Title; cardValues[1] = lblCard2Value;
-        cardTitles[2] = lblCard3Title; cardValues[2] = lblCard3Value;
-        cardTitles[3] = lblCard4Title; cardValues[3] = lblCard4Value;
-        cardTitles[4] = lblCard5Title; cardValues[4] = lblCard5Value;
+        cardTitles[0] = lblCard1Title;
+        cardValues[0] = lblCard1Value;
+        cardTitles[1] = lblCard2Title;
+        cardValues[1] = lblCard2Value;
+        cardTitles[2] = lblCard3Title;
+        cardValues[2] = lblCard3Value;
+        cardTitles[3] = lblCard4Title;
+        cardValues[3] = lblCard4Value;
+        cardTitles[4] = lblCard5Title;
+        cardValues[4] = lblCard5Value;
     }
 
     private void showSummaryCard(int idx, String title, String value) {
-        if (cardTitles[0] == null) linkCardLabels();
+        if (cardTitles[0] == null)
+            linkCardLabels();
         cardTitles[idx].setText(title);
         cardValues[idx].setText(value);
         if (cardTitles[idx].getParent() != null) {
@@ -392,7 +446,8 @@ public class ReportController implements Initializable {
     }
 
     private void hideSummaryCards(int... indices) {
-        if (cardTitles[0] == null) linkCardLabels();
+        if (cardTitles[0] == null)
+            linkCardLabels();
         for (int idx : indices) {
             if (cardTitles[idx].getParent() != null) {
                 cardTitles[idx].getParent().setVisible(false);
@@ -402,10 +457,13 @@ public class ReportController implements Initializable {
     }
 
     private void clearSummaryCards() {
-        if (cardTitles[0] == null) linkCardLabels();
+        if (cardTitles[0] == null)
+            linkCardLabels();
         for (int i = 0; i < 5; i++) {
-            if (cardTitles[i] != null) cardTitles[i].setText("");
-            if (cardValues[i] != null) cardValues[i].setText("");
+            if (cardTitles[i] != null)
+                cardTitles[i].setText("");
+            if (cardValues[i] != null)
+                cardValues[i].setText("");
         }
     }
 
@@ -414,14 +472,16 @@ public class ReportController implements Initializable {
     @FXML
     private void onExportExcel() {
         if (currentReportData == null) {
-            AlertUtil.showWarning("No Data", "Generate a report before exporting."); return;
+            AlertUtil.showWarning("No Data", "Generate a report before exporting.");
+            return;
         }
         FileChooser fc = new FileChooser();
         fc.setTitle("Save Excel File");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
         fc.setInitialFileName(currentReportType.replace(" ", "_") + ".xlsx");
         File file = fc.showSaveDialog(btnExportExcel.getScene().getWindow());
-        if (file == null) return;
+        if (file == null)
+            return;
         try {
             reportService.exportToExcel(currentReportType, currentReportData, file);
             AlertUtil.showInfo("Export Successful", "Report exported to:\n" + file.getAbsolutePath());
@@ -436,11 +496,15 @@ public class ReportController implements Initializable {
     @FXML
     private void onPrint() {
         if (tblReport.getItems().isEmpty()) {
-            AlertUtil.showWarning("No Data", "Generate a report before printing."); return;
+            AlertUtil.showWarning("No Data", "Generate a report before printing.");
+            return;
         }
         try {
             PrinterJob job = PrinterJob.createPrinterJob();
-            if (job == null) { AlertUtil.showError("Printer Error", "No printer available."); return; }
+            if (job == null) {
+                AlertUtil.showError("Printer Error", "No printer available.");
+                return;
+            }
             if (job.showPrintDialog(btnPrint.getScene().getWindow())) {
                 boolean printed = job.printPage(tblReport);
                 if (printed) {
@@ -473,9 +537,24 @@ public class ReportController implements Initializable {
         cmbSupplier.getSelectionModel().selectFirst();
         cmbStockStatus.getSelectionModel().selectFirst();
         txtProductSearch.clear();
-        if (txtSearch != null) txtSearch.clear();
+        if (txtSearch != null)
+            txtSearch.clear();
         clearTable();
         clearSummaryCards();
         currentReportData = null;
+    }
+
+    @FXML
+    private void onBackToDashboard() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/dashboard.fxml"));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) cmbReportType.getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Dashboard");
+        } catch (java.io.IOException e) {
+            AlertUtil.showError("Navigation Error", "Could not load Dashboard.");
+        }
     }
 }

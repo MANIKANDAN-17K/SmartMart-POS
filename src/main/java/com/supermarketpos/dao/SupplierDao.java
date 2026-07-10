@@ -14,7 +14,7 @@ public class SupplierDao {
                 "(supplier_code, supplier_name, contact_person, mobile, email, gst_number, " +
                 "address, city, state, pincode, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             bindSupplier(ps, supplier);
             ps.executeUpdate();
@@ -33,7 +33,7 @@ public class SupplierDao {
                 "mobile = ?, email = ?, gst_number = ?, address = ?, city = ?, state = ?, pincode = ? " +
                 "WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, supplier.getSupplierCode());
             ps.setString(2, supplier.getSupplierName());
@@ -53,7 +53,7 @@ public class SupplierDao {
     public void setActiveStatus(int id, boolean active) throws SQLException {
         String sql = "UPDATE suppliers SET active = ? WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, active);
             ps.setInt(2, id);
@@ -64,7 +64,7 @@ public class SupplierDao {
     public Supplier findById(int id) throws SQLException {
         String sql = "SELECT * FROM suppliers WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -81,7 +81,7 @@ public class SupplierDao {
                 ? "SELECT COUNT(*) FROM suppliers WHERE LOWER(supplier_code) = LOWER(?)"
                 : "SELECT COUNT(*) FROM suppliers WHERE LOWER(supplier_code) = LOWER(?) AND id != ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, supplierCode);
             if (excludeId != null) {
@@ -101,7 +101,7 @@ public class SupplierDao {
                 ? "SELECT COUNT(*) FROM suppliers WHERE LOWER(supplier_name) = LOWER(?)"
                 : "SELECT COUNT(*) FROM suppliers WHERE LOWER(supplier_name) = LOWER(?) AND id != ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, supplierName);
             if (excludeId != null) {
@@ -120,8 +120,8 @@ public class SupplierDao {
         String sql = "SELECT * FROM suppliers ORDER BY supplier_name ASC";
         List<Supplier> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 list.add(mapRow(rs));
@@ -130,11 +130,23 @@ public class SupplierDao {
         return list;
     }
 
+    public int countActive() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM suppliers WHERE active = true";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
     public List<Supplier> findByStatus(boolean active) throws SQLException {
         String sql = "SELECT * FROM suppliers WHERE active = ? ORDER BY supplier_name ASC";
         List<Supplier> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, active);
             try (ResultSet rs = ps.executeQuery()) {
@@ -151,7 +163,7 @@ public class SupplierDao {
                 "OR mobile LIKE ? ORDER BY supplier_name ASC";
         List<Supplier> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             String like = "%" + keyword + "%";
             ps.setString(1, like);
@@ -196,8 +208,10 @@ public class SupplierDao {
         s.setActive(rs.getBoolean("active"));
         Timestamp created = rs.getTimestamp("created_at");
         Timestamp updated = rs.getTimestamp("updated_at");
-        if (created != null) s.setCreatedAt(created.toLocalDateTime());
-        if (updated != null) s.setUpdatedAt(updated.toLocalDateTime());
+        if (created != null)
+            s.setCreatedAt(created.toLocalDateTime());
+        if (updated != null)
+            s.setUpdatedAt(updated.toLocalDateTime());
         return s;
     }
 }

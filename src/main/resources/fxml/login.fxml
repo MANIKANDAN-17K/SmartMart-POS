@@ -21,7 +21,7 @@
     <Label text="SmartMart POS" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
     <Label text="Sign in to continue"/>
 
-    <GridPane hgap="10.0" vgap="10.0">
+    <GridPane hgap="10.0" vgap="10.0" alignment="CENTER">
         <columnConstraints>
             <ColumnConstraints minWidth="100.0"/>
             <ColumnConstraints minWidth="220.0"/>

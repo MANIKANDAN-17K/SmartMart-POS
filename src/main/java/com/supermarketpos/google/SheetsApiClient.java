@@ -4,7 +4,6 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
-import com.sun.net.httpserver.Request;
 
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +63,8 @@ public class SheetsApiClient {
 
     /** Appends rows only. Never deletes existing data, per sync rules. */
     public void appendRows(String spreadsheetId, String sheetName, List<List<Object>> rows) throws Exception {
-        if (rows.isEmpty()) return;
+        if (rows.isEmpty())
+            return;
         ValueRange body = new ValueRange().setValues(rows);
         sheetsService.spreadsheets().values()
                 .append(spreadsheetId, sheetName + "!A1", body)
@@ -73,7 +73,10 @@ public class SheetsApiClient {
                 .execute();
     }
 
-    /** Overwrites a specific range - used for update-in-place sync of existing rows only. */
+    /**
+     * Overwrites a specific range - used for update-in-place sync of existing rows
+     * only.
+     */
     public void updateRange(String spreadsheetId, String range, List<List<Object>> rows) throws Exception {
         ValueRange body = new ValueRange().setValues(rows);
         sheetsService.spreadsheets().values()

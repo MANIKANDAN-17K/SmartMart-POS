@@ -8,11 +8,14 @@
             stylesheets="@../css/common.css"
             prefWidth="1100" prefHeight="750">
 
-    <!-- TOP: Title + Report Selector -->
     <top>
         <VBox styleClass="top-bar" spacing="8">
             <padding><Insets topRightBottomLeft="12"/></padding>
-            <Label text="Reports &amp; Analytics" styleClass="page-title"/>
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <Label text="Reports &amp; Analytics" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Dashboard" onAction="#onBackToDashboard" styleClass="btn-secondary"/>
+            </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Report Type:"/>
                 <ComboBox fx:id="cmbReportType" prefWidth="220"/>

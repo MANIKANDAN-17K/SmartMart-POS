@@ -2,10 +2,16 @@ package com.supermarketpos.service;
 
 import com.supermarketpos.dao.SettingsDao;
 import com.supermarketpos.model.StoreSettings;
+import com.supermarketpos.model.TaxSetting;
+import com.supermarketpos.util.ValidationUtil;
+import com.supermarketpos.util.ThemeUtil;
+
+import java.sql.SQLException;
 
 public class SettingsService {
 
     private final SettingsDao settingsDao;
+    private final AuditService auditService = new AuditService();
 
     public SettingsService() {
         this.settingsDao = new SettingsDao();
@@ -27,8 +33,6 @@ public class SettingsService {
             return defaults;
         });
     }
-    private final SettingsDao settingsDao = new SettingsDao();
-    private final AuditService auditService = new AuditService();
 
     public StoreSettings getStoreSettings() throws SQLException {
         return settingsDao.getStoreSettings();
@@ -41,7 +45,7 @@ public class SettingsService {
             throw new IllegalArgumentException("Invalid email address.");
         if (!ValidationUtil.isValidPhone(s.getPhone()))
             throw new IllegalArgumentException("Invalid phone number.");
-        if (!ValidationUtil.isValidGst(s.getGstNumber()))
+        if (!ValidationUtil.isValidGstNumber(s.getGstNumber()))
             throw new IllegalArgumentException("Invalid GST number.");
 
         settingsDao.saveStoreSettings(s);

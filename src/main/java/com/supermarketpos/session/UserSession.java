@@ -43,4 +43,14 @@ public final class UserSession {
     public boolean isActive() {
         return currentUser != null;
     }
+
+    public static int getUserId() {
+        UserSession s = getInstance();
+        return s.currentUser != null ? s.currentUser.getId() : 1;
+    }
+
+    public static String getUserName() {
+        UserSession s = getInstance();
+        return s.currentUser != null ? s.currentUser.getUsername() : "System";
+    }
 }

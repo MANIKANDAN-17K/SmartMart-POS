@@ -21,7 +21,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>com.supermarketpos.MainApp</mainClass>
+          <mainClass>com.supermarketpos.Main</mainClass>
         </configuration>
       </plugin>
       <plugin>
@@ -36,7 +36,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.supermarketpos.MainApp</mainClass>
+                  <mainClass>com.supermarketpos.Main</mainClass>
                 </transformer>
               </transformers>
               <filters>

@@ -1,7 +1,7 @@
 package com.supermarketpos.dao;
 
 import com.supermarketpos.model.Category;
-import com.supermarketpos.database.DatabaseInitializer              ;
+import com.supermarketpos.util.DBConnection;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ public class CategoryDao {
     public int create(Category category) throws SQLException {
         String sql = "INSERT INTO categories (name, description, active) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, category.getName());
             ps.setString(2, category.getDescription());
@@ -32,7 +32,7 @@ public class CategoryDao {
     public void update(Category category) throws SQLException {
         String sql = "UPDATE categories SET name = ?, description = ? WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, category.getName());
             ps.setString(2, category.getDescription());
@@ -44,7 +44,7 @@ public class CategoryDao {
     public void setActiveStatus(int id, boolean active) throws SQLException {
         String sql = "UPDATE categories SET active = ? WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, active);
             ps.setInt(2, id);
@@ -55,7 +55,7 @@ public class CategoryDao {
     public Category findById(int id) throws SQLException {
         String sql = "SELECT * FROM categories WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -72,7 +72,7 @@ public class CategoryDao {
                 ? "SELECT COUNT(*) FROM categories WHERE LOWER(name) = LOWER(?)"
                 : "SELECT COUNT(*) FROM categories WHERE LOWER(name) = LOWER(?) AND id != ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, name);
             if (excludeId != null) {
@@ -91,8 +91,8 @@ public class CategoryDao {
         String sql = "SELECT * FROM categories ORDER BY name ASC";
         List<Category> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 list.add(mapRow(rs));
@@ -105,7 +105,7 @@ public class CategoryDao {
         String sql = "SELECT * FROM categories WHERE name LIKE ? ORDER BY name ASC";
         List<Category> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, "%" + keyword + "%");
             try (ResultSet rs = ps.executeQuery()) {
@@ -121,8 +121,8 @@ public class CategoryDao {
         String sql = "SELECT * FROM categories WHERE active = TRUE ORDER BY name ASC";
         List<Category> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 list.add(mapRow(rs));
@@ -139,8 +139,10 @@ public class CategoryDao {
         c.setActive(rs.getBoolean("active"));
         Timestamp created = rs.getTimestamp("created_at");
         Timestamp updated = rs.getTimestamp("updated_at");
-        if (created != null) c.setCreatedAt(created.toLocalDateTime());
-        if (updated != null) c.setUpdatedAt(updated.toLocalDateTime());
+        if (created != null)
+            c.setCreatedAt(created.toLocalDateTime());
+        if (updated != null)
+            c.setUpdatedAt(updated.toLocalDateTime());
         return c;
     }
 }

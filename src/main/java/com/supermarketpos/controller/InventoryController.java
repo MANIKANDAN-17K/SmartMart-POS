@@ -19,48 +19,85 @@ import java.util.List;
 
 public class InventoryController {
 
-    @FXML private Label totalProductsLabel;
-    @FXML private Label totalStockItemsLabel;
-    @FXML private Label lowStockCountLabel;
-    @FXML private Label outOfStockCountLabel;
+    @FXML
+    private Label totalProductsLabel;
+    @FXML
+    private Label totalStockItemsLabel;
+    @FXML
+    private Label lowStockCountLabel;
+    @FXML
+    private Label outOfStockCountLabel;
 
-    @FXML private TextField searchField;
-    @FXML private ComboBox<Category> categoryFilter;
-    @FXML private ComboBox<String> statusFilter;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ComboBox<Category> categoryFilter;
+    @FXML
+    private ComboBox<String> statusFilter;
 
-    @FXML private TableView<ProductDao.InventoryRow> inventoryTable;
-    @FXML private TableColumn<ProductDao.InventoryRow, String> barcodeColumn;
-    @FXML private TableColumn<ProductDao.InventoryRow, String> skuColumn;
-    @FXML private TableColumn<ProductDao.InventoryRow, String> nameColumn;
-    @FXML private TableColumn<ProductDao.InventoryRow, String> categoryColumn;
-    @FXML private TableColumn<ProductDao.InventoryRow, Number> currentStockColumn;
-    @FXML private TableColumn<ProductDao.InventoryRow, Number> minStockColumn;
-    @FXML private TableColumn<ProductDao.InventoryRow, String> statusColumn;
-    @FXML private TableColumn<ProductDao.InventoryRow, String> lastUpdatedColumn;
+    @FXML
+    private TableView<ProductDao.InventoryRow> inventoryTable;
+    @FXML
+    private TableColumn<ProductDao.InventoryRow, String> barcodeColumn;
+    @FXML
+    private TableColumn<ProductDao.InventoryRow, String> skuColumn;
+    @FXML
+    private TableColumn<ProductDao.InventoryRow, String> nameColumn;
+    @FXML
+    private TableColumn<ProductDao.InventoryRow, String> categoryColumn;
+    @FXML
+    private TableColumn<ProductDao.InventoryRow, Number> currentStockColumn;
+    @FXML
+    private TableColumn<ProductDao.InventoryRow, Number> minStockColumn;
+    @FXML
+    private TableColumn<ProductDao.InventoryRow, String> statusColumn;
+    @FXML
+    private TableColumn<ProductDao.InventoryRow, String> lastUpdatedColumn;
 
-    @FXML private ComboBox<String> adjustmentTypeDropdown;
-    @FXML private TextField adjustmentQuantityField;
-    @FXML private TextField reasonField;
-    @FXML private TextArea remarksField;
-    @FXML private Label selectedProductLabel;
-    @FXML private Label currentStockLabel;
+    @FXML
+    private ComboBox<String> adjustmentTypeDropdown;
+    @FXML
+    private TextField adjustmentQuantityField;
+    @FXML
+    private TextField reasonField;
+    @FXML
+    private TextArea remarksField;
+    @FXML
+    private Label selectedProductLabel;
+    @FXML
+    private Label currentStockLabel;
 
-    @FXML private TableView<StockMovement> movementTable;
-    @FXML private TableColumn<StockMovement, String> movementDateColumn;
-    @FXML private TableColumn<StockMovement, String> movementProductColumn;
-    @FXML private TableColumn<StockMovement, String> movementTypeColumn;
-    @FXML private TableColumn<StockMovement, Number> movementQuantityColumn;
-    @FXML private TableColumn<StockMovement, Number> movementPreviousColumn;
-    @FXML private TableColumn<StockMovement, Number> movementCurrentColumn;
-    @FXML private TableColumn<StockMovement, String> movementReferenceColumn;
-    @FXML private TableColumn<StockMovement, String> movementPerformedByColumn;
+    @FXML
+    private TableView<StockMovement> movementTable;
+    @FXML
+    private TableColumn<StockMovement, String> movementDateColumn;
+    @FXML
+    private TableColumn<StockMovement, String> movementProductColumn;
+    @FXML
+    private TableColumn<StockMovement, String> movementTypeColumn;
+    @FXML
+    private TableColumn<StockMovement, Number> movementQuantityColumn;
+    @FXML
+    private TableColumn<StockMovement, Number> movementPreviousColumn;
+    @FXML
+    private TableColumn<StockMovement, Number> movementCurrentColumn;
+    @FXML
+    private TableColumn<StockMovement, String> movementReferenceColumn;
+    @FXML
+    private TableColumn<StockMovement, String> movementPerformedByColumn;
 
-    @FXML private Button refreshButton;
-    @FXML private Button searchButton;
-    @FXML private Button adjustStockButton;
-    @FXML private Button viewHistoryButton;
-    @FXML private Button exportButton;
-    @FXML private Button clearButton;
+    @FXML
+    private Button refreshButton;
+    @FXML
+    private Button searchButton;
+    @FXML
+    private Button adjustStockButton;
+    @FXML
+    private Button viewHistoryButton;
+    @FXML
+    private Button exportButton;
+    @FXML
+    private Button clearButton;
 
     private final InventoryService inventoryService = new InventoryService();
     private final CategoryService categoryService = new CategoryService();
@@ -84,11 +121,10 @@ public class InventoryController {
         currentStockColumn.setCellValueFactory(new PropertyValueFactory<>("currentStock"));
         minStockColumn.setCellValueFactory(new PropertyValueFactory<>("minStockQuantity"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("stockStatus"));
-        lastUpdatedColumn.setCellValueFactory(cell ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cell.getValue().getUpdatedAt() != null
-                                ? cell.getValue().getUpdatedAt().toLocalDate().toString()
-                                : ""));
+        lastUpdatedColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(
+                cell.getValue().getUpdatedAt() != null
+                        ? cell.getValue().getUpdatedAt().toLocalDate().toString()
+                        : ""));
 
         inventoryTable.setItems(inventoryList);
         inventoryTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -96,11 +132,10 @@ public class InventoryController {
             populateAdjustmentPanel(newVal);
         });
 
-        movementDateColumn.setCellValueFactory(cell ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cell.getValue().getMovementDate() != null
-                                ? cell.getValue().getMovementDate().toString()
-                                : ""));
+        movementDateColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(
+                cell.getValue().getMovementDate() != null
+                        ? cell.getValue().getMovementDate().toString()
+                        : ""));
         movementProductColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         movementTypeColumn.setCellValueFactory(new PropertyValueFactory<>("movementType"));
         movementQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
@@ -180,8 +215,9 @@ public class InventoryController {
         }
 
         try {
-            // TODO: replace with your actual UserSession accessor, e.g. UserSession.getCurrentUser().getUsername()
-            String performedBy = com.supermarketpos.util.UserSession.getCurrentUsername();
+            // TODO: replace with your actual UserSession accessor, e.g.
+            // UserSession.getCurrentUser().getUsername()
+            String performedBy = com.supermarketpos.util.UserSession.getInstance().getCurrentUsername();
 
             inventoryService.adjustStock(selectedRow.getProductId(), adjustmentType, quantity,
                     reasonField.getText(), remarksField.getText(), performedBy);
@@ -212,7 +248,8 @@ public class InventoryController {
 
     @FXML
     private void handleExport() {
-        // Placeholder — CSV/Excel export is out of scope for this sprint's allowed files.
+        // Placeholder — CSV/Excel export is out of scope for this sprint's allowed
+        // files.
         AlertUtil.showInfo("Export", "Export functionality will be added in a future sprint.");
     }
 
@@ -277,5 +314,19 @@ public class InventoryController {
         remarksField.clear();
         selectedProductLabel.setText("");
         currentStockLabel.setText("");
+    }
+
+    @FXML
+    private void handleBackToDashboard() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/dashboard.fxml"));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) totalProductsLabel.getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Dashboard");
+        } catch (java.io.IOException e) {
+            AlertUtil.showError("Navigation Error", "Could not load Dashboard.");
+        }
     }
 }

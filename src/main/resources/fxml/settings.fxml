@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.supermarketpos.controller.SettingsController"
+            stylesheets="@../css/common.css" prefWidth="900" prefHeight="650">
+
+    <top>
+        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <Label text="Store Settings" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Dashboard" onAction="#onBackToDashboard" styleClass="btn-secondary"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <!-- Store Tab -->
+                <Tab text="Store Profile">
+                    <content>
+                        <GridPane hgap="10" vgap="10">
+                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="120" prefWidth="150" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+
+                            <Label text="Store Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <TextField fx:id="storeNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Address:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <TextField fx:id="addressField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="GST Number:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextField fx:id="gstNumberField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                            <Label text="Phone:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <TextField fx:id="phoneField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                            <Label text="Email:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                            <TextField fx:id="emailField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                            <Label text="Logo Preview:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                            <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="5" GridPane.columnIndex="1">
+                                <ImageView fx:id="logoPreview" fitWidth="100" fitHeight="50" preserveRatio="true"/>
+                                <Button text="Upload Logo" onAction="#onUploadLogo"/>
+                            </HBox>
+
+                            <Button text="Save Settings" onAction="#onSaveStoreSettings" styleClass="btn-primary"
+                                    GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                        </GridPane>
+                    </content>
+                </Tab>
+
+                <!-- Tax Tab -->
+                <Tab text="Tax Settings">
+                    <content>
+                        <GridPane hgap="10" vgap="10">
+                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                            <Label text="GST Default Percentage (%):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <TextField fx:id="gstPercentageField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Enable GST:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <CheckBox fx:id="gstEnabledCheck" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Button text="Save Tax Settings" onAction="#onSaveTaxSettings" styleClass="btn-primary"
+                                    GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        </GridPane>
+                    </content>
+                </Tab>
+
+                <!-- Receipt Tab -->
+                <Tab text="Receipt Customization">
+                    <content>
+                        <GridPane hgap="10" vgap="10">
+                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="120" prefWidth="150" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+
+                            <Label text="Receipt Header:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <TextArea fx:id="receiptHeaderField" prefRowCount="3" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Receipt Footer:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <TextArea fx:id="receiptFooterField" prefRowCount="3" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Options:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <VBox spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                                <CheckBox fx:id="showLogoCheck" text="Show Logo on Receipt"/>
+                                <CheckBox fx:id="showGstCheck" text="Show GST on Receipt"/>
+                                <CheckBox fx:id="showCashierCheck" text="Show Cashier on Receipt"/>
+                            </VBox>
+
+                            <Button text="Save Receipt Settings" onAction="#onSaveStoreSettings" styleClass="btn-primary"
+                                    GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        </GridPane>
+                    </content>
+                </Tab>
+
+                <!-- Theme Tab -->
+                <Tab text="Theme Settings">
+                    <content>
+                        <VBox spacing="15">
+                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                            <Label text="Choose Application Theme:" style="-fx-font-weight: bold;"/>
+                            <fx:define>
+                                <ToggleGroup fx:id="themeGroup"/>
+                            </fx:define>
+                            <RadioButton fx:id="lightThemeRadio" text="Light Theme" toggleGroup="$themeGroup" selected="true"/>
+                            <RadioButton fx:id="darkThemeRadio" text="Dark Theme" toggleGroup="$themeGroup"/>
+                            <Button text="Apply Theme" onAction="#onApplyTheme" styleClass="btn-primary"/>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <!-- Backup Tab -->
+                <Tab text="Database Backup">
+                    <content>
+                        <VBox spacing="15">
+                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                            <Label text="Database Backup &amp; Recovery" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                            <Label fx:id="backupStatusLabel" text="Status: Ready" styleClass="label-muted"/>
+                            <HBox spacing="15">
+                                <Button text="Backup Database" onAction="#onBackupDatabase" styleClass="btn-success"/>
+                                <Button text="Restore Database" onAction="#onRestoreDatabase" styleClass="btn-danger"/>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <!-- Audit Log Tab -->
+                <Tab text="System Audit Log">
+                    <content>
+                        <VBox spacing="10">
+                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="User:"/>
+                                <TextField fx:id="auditUserField" prefWidth="120" promptText="Filter User"/>
+                                <Label text="Action:"/>
+                                <TextField fx:id="auditActionField" prefWidth="120" promptText="Filter Action"/>
+                                <Label text="Date:"/>
+                                <DatePicker fx:id="auditDatePicker"/>
+                                <Button text="Search" onAction="#onSearchAuditLogs" styleClass="btn-primary"/>
+                                <Button text="Refresh" onAction="#onRefreshAuditLogs" styleClass="btn-secondary"/>
+                            </HBox>
+                            <TableView fx:id="auditTable" VBox.vgrow="ALWAYS">
+                                <columns>
+                                    <TableColumn text="Timestamp" prefWidth="150">
+                                        <cellValueFactory><javafx.scene.control.cell.PropertyValueFactory property="timestamp"/></cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn text="User" prefWidth="120">
+                                        <cellValueFactory><javafx.scene.control.cell.PropertyValueFactory property="username"/></cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn text="Action" prefWidth="150">
+                                        <cellValueFactory><javafx.scene.control.cell.PropertyValueFactory property="action"/></cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn text="Details" prefWidth="300">
+                                        <cellValueFactory><javafx.scene.control.cell.PropertyValueFactory property="details"/></cellValueFactory>
+                                    </TableColumn>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

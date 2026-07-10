@@ -5,10 +5,12 @@ public class UserSession {
     private String username;
     private String role;
 
-    private UserSession() {}
+    private UserSession() {
+    }
 
     public static UserSession getInstance() {
-        if (instance == null) instance = new UserSession();
+        if (instance == null)
+            instance = new UserSession();
         return instance;
     }
 
@@ -17,7 +19,19 @@ public class UserSession {
         this.role = role;
     }
 
-    public String getUsername() { return username; }
-    public String getRole() { return role; }
-    public boolean isAdmin() { return "ADMIN".equalsIgnoreCase(role); }
+    public String getUsername() {
+        return username;
+    }
+
+    public String getCurrentUsername() {
+        return username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public boolean isAdmin() {
+        return "ADMIN".equalsIgnoreCase(role);
+    }
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.supermarketpos.controller.PurchaseController"
+            stylesheets="@../css/common.css" prefWidth="900" prefHeight="650">
+
+    <top>
+        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <Label text="Purchases Management" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Dashboard" onAction="#onBackToDashboard" styleClass="btn-secondary"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Start Date:"/>
+                <DatePicker fx:id="dpStartDate"/>
+                <Label text="End Date:"/>
+                <DatePicker fx:id="dpEndDate"/>
+                <Label text="Supplier:"/>
+                <ComboBox fx:id="cmbSupplier" prefWidth="150"/>
+                <Button text="Search" onAction="#onSearch" styleClass="btn-primary"/>
+            </HBox>
+
+            <TableView fx:id="purchaseTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colPurchaseId" text="Purchase ID" prefWidth="100"/>
+                    <TableColumn fx:id="colPurchaseDate" text="Date" prefWidth="150"/>
+                    <TableColumn fx:id="colSupplier" text="Supplier" prefWidth="180"/>
+                    <TableColumn fx:id="colProduct" text="Product Name" prefWidth="200"/>
+                    <TableColumn fx:id="colQty" text="Qty" prefWidth="80"/>
+                    <TableColumn fx:id="colAmount" text="Amount" prefWidth="120"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

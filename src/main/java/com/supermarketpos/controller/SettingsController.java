@@ -20,28 +20,54 @@ import java.util.List;
 public class SettingsController {
 
     // Store tab
-    @FXML private TextField storeNameField, addressField, gstNumberField, phoneField, emailField;
-    @FXML private ImageViewOrLabelPlaceholder logoPreview; // replace with ImageView in real FXML
+    @FXML
+    private TextField storeNameField, addressField, gstNumberField, phoneField, emailField;
+    @FXML
+    private javafx.scene.image.ImageView logoPreview;
+
+    @FXML
+    public void onBackToDashboard() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/dashboard.fxml"));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) storeNameField.getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Dashboard");
+        } catch (java.io.IOException e) {
+            AlertUtil.showError("Could not load Dashboard.");
+        }
+    }
 
     // Tax tab
-    @FXML private TextField gstPercentageField;
-    @FXML private CheckBox gstEnabledCheck;
+    @FXML
+    private TextField gstPercentageField;
+    @FXML
+    private CheckBox gstEnabledCheck;
 
     // Receipt tab
-    @FXML private TextArea receiptHeaderField, receiptFooterField;
-    @FXML private CheckBox showLogoCheck, showGstCheck, showCashierCheck;
+    @FXML
+    private TextArea receiptHeaderField, receiptFooterField;
+    @FXML
+    private CheckBox showLogoCheck, showGstCheck, showCashierCheck;
 
     // Theme tab
-    @FXML private ToggleGroup themeGroup;
-    @FXML private RadioButton lightThemeRadio, darkThemeRadio;
+    @FXML
+    private ToggleGroup themeGroup;
+    @FXML
+    private RadioButton lightThemeRadio, darkThemeRadio;
 
     // Backup tab
-    @FXML private Label backupStatusLabel;
+    @FXML
+    private Label backupStatusLabel;
 
     // Audit tab
-    @FXML private TableView<AuditLog> auditTable;
-    @FXML private TextField auditUserField, auditActionField;
-    @FXML private DatePicker auditDatePicker;
+    @FXML
+    private TableView<AuditLog> auditTable;
+    @FXML
+    private TextField auditUserField, auditActionField;
+    @FXML
+    private DatePicker auditDatePicker;
 
     private final SettingsService settingsService = new SettingsService();
     private final BackupService backupService = new BackupService();
@@ -72,8 +98,10 @@ public class SettingsController {
                 showLogoCheck.setSelected(s.isShowLogoOnReceipt());
                 showGstCheck.setSelected(s.isShowGstOnReceipt());
                 showCashierCheck.setSelected(s.isShowCashierOnReceipt());
-                if ("dark".equals(s.getTheme())) darkThemeRadio.setSelected(true);
-                else lightThemeRadio.setSelected(true);
+                if ("dark".equals(s.getTheme()))
+                    darkThemeRadio.setSelected(true);
+                else
+                    lightThemeRadio.setSelected(true);
             }
         } catch (Exception e) {
             AlertUtil.showError("Failed to load store settings.");
@@ -227,7 +255,4 @@ public class SettingsController {
         }
     }
 
-    // Dummy placeholder type since ImageView isn't imported above to keep this snippet compact.
-    // Replace with javafx.scene.image.ImageView in your real FXML/controller binding.
-    private static class ImageViewOrLabelPlaceholder {}
 }

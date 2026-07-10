@@ -36,69 +36,108 @@ public class BillingController implements Initializable {
 
     // ── injected via UserSession ──────────────────────────────────────────────
     // Replace with your actual UserSession / SessionManager class
-    private int    cashierId   = com.supermarketpos.session.UserSession.getUserId();
+    private int cashierId = com.supermarketpos.session.UserSession.getUserId();
     private String cashierName = com.supermarketpos.session.UserSession.getUserName();
 
     // ── services / DAOs ───────────────────────────────────────────────────────
     private final BillingService billingService = new BillingService();
     private final ReceiptService receiptService = new ReceiptService();
-    private final ProductDao     productDao     = new ProductDao();
-    private final CustomerDao    customerDao    = new CustomerDao();
+    private final ProductDao productDao = new ProductDao();
+    private final CustomerDao customerDao = new CustomerDao();
 
     // ── state ─────────────────────────────────────────────────────────────────
     private Bill currentBill;
     private final ObservableList<BillItem> cartItems = FXCollections.observableArrayList();
 
     // ── FXML – header ─────────────────────────────────────────────────────────
-    @FXML private Label lblInvoiceNumber;
-    @FXML private Label lblCashier;
-    @FXML private Label lblDateTime;
-    @FXML private TextField tfCustomerSearch;
-    @FXML private ListView<Customer> lvCustomerResults;
-    @FXML private Label lblSelectedCustomer;
-    @FXML private Button btnNewBill;
+    @FXML
+    private Label lblInvoiceNumber;
+    @FXML
+    private Label lblCashier;
+    @FXML
+    private Label lblDateTime;
+    @FXML
+    private TextField tfCustomerSearch;
+    @FXML
+    private ListView<Customer> lvCustomerResults;
+    @FXML
+    private Label lblSelectedCustomer;
+    @FXML
+    private Button btnNewBill;
 
     // ── FXML – product search ─────────────────────────────────────────────────
-    @FXML private TextField tfBarcode;
-    @FXML private TextField tfProductSearch;
-    @FXML private ListView<Product> lvProductResults;
+    @FXML
+    private TextField tfBarcode;
+    @FXML
+    private TextField tfProductSearch;
+    @FXML
+    private ListView<Product> lvProductResults;
 
     // ── FXML – cart table ─────────────────────────────────────────────────────
-    @FXML private TableView<BillItem>             tblCart;
-    @FXML private TableColumn<BillItem, String>   colBarcode;
-    @FXML private TableColumn<BillItem, String>   colProduct;
-    @FXML private TableColumn<BillItem, BigDecimal> colPrice;
-    @FXML private TableColumn<BillItem, Integer>  colQty;
-    @FXML private TableColumn<BillItem, BigDecimal> colDiscount;
-    @FXML private TableColumn<BillItem, BigDecimal> colGst;
-    @FXML private TableColumn<BillItem, BigDecimal> colLineTotal;
-    @FXML private TableColumn<BillItem, Void>     colRemove;
+    @FXML
+    private TableView<BillItem> tblCart;
+    @FXML
+    private TableColumn<BillItem, String> colBarcode;
+    @FXML
+    private TableColumn<BillItem, String> colProduct;
+    @FXML
+    private TableColumn<BillItem, BigDecimal> colPrice;
+    @FXML
+    private TableColumn<BillItem, Integer> colQty;
+    @FXML
+    private TableColumn<BillItem, BigDecimal> colDiscount;
+    @FXML
+    private TableColumn<BillItem, BigDecimal> colGst;
+    @FXML
+    private TableColumn<BillItem, BigDecimal> colLineTotal;
+    @FXML
+    private TableColumn<BillItem, Void> colRemove;
 
     // ── FXML – summary ────────────────────────────────────────────────────────
-    @FXML private Label lblItemCount;
-    @FXML private Label lblSubtotal;
-    @FXML private Label lblDiscount;
-    @FXML private Label lblGst;
-    @FXML private Label lblGrandTotal;
-    @FXML private TextField tfBillDiscount;
+    @FXML
+    private Label lblItemCount;
+    @FXML
+    private Label lblSubtotal;
+    @FXML
+    private Label lblDiscount;
+    @FXML
+    private Label lblGst;
+    @FXML
+    private Label lblGrandTotal;
+    @FXML
+    private TextField tfBillDiscount;
 
     // ── FXML – payment ────────────────────────────────────────────────────────
-    @FXML private ToggleGroup tgPayment;
-    @FXML private RadioButton rbCash;
-    @FXML private RadioButton rbCard;
-    @FXML private RadioButton rbUpi;
-    @FXML private RadioButton rbSplit;
-    @FXML private TextField   tfCashPaid;
-    @FXML private TextField   tfCardPaid;
-    @FXML private TextField   tfUpiPaid;
-    @FXML private Label       lblBalance;
+    @FXML
+    private ToggleGroup tgPayment;
+    @FXML
+    private RadioButton rbCash;
+    @FXML
+    private RadioButton rbCard;
+    @FXML
+    private RadioButton rbUpi;
+    @FXML
+    private RadioButton rbSplit;
+    @FXML
+    private TextField tfCashPaid;
+    @FXML
+    private TextField tfCardPaid;
+    @FXML
+    private TextField tfUpiPaid;
+    @FXML
+    private Label lblBalance;
 
     // ── FXML – action buttons ─────────────────────────────────────────────────
-    @FXML private Button btnCompleteBill;
-    @FXML private Button btnCancelBill;
-    @FXML private Button btnPrintReceipt;
-    @FXML private Button btnReprintReceipt;
-    @FXML private Button btnClearCart;
+    @FXML
+    private Button btnCompleteBill;
+    @FXML
+    private Button btnCancelBill;
+    @FXML
+    private Button btnPrintReceipt;
+    @FXML
+    private Button btnReprintReceipt;
+    @FXML
+    private Button btnClearCart;
 
     // ── init ──────────────────────────────────────────────────────────────────
 
@@ -115,10 +154,8 @@ public class BillingController implements Initializable {
 
     private void startClock() {
         javafx.animation.Timeline clock = new javafx.animation.Timeline(
-                new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1), e ->
-                        lblDateTime.setText(DateUtil.now())
-                )
-        );
+                new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1),
+                        e -> lblDateTime.setText(DateUtil.now())));
         clock.setCycleCount(javafx.animation.Animation.INDEFINITE);
         clock.play();
     }
@@ -153,9 +190,14 @@ public class BillingController implements Initializable {
                     }
                 });
             }
-            @Override protected void updateItem(Integer qty, boolean empty) {
+
+            @Override
+            protected void updateItem(Integer qty, boolean empty) {
                 super.updateItem(qty, empty);
-                if (empty || qty == null) { setGraphic(null); return; }
+                if (empty || qty == null) {
+                    setGraphic(null);
+                    return;
+                }
                 spinner.getValueFactory().setValue(qty);
                 setGraphic(spinner);
             }
@@ -164,12 +206,16 @@ public class BillingController implements Initializable {
         // Remove button column
         colRemove.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("✕");
-            { btn.setOnAction(e -> {
-                BillItem item = getTableView().getItems().get(getIndex());
-                billingService.removeItem(currentBill, item.getProductId());
-                refreshCart();
-            }); }
-            @Override protected void updateItem(Void v, boolean empty) {
+            {
+                btn.setOnAction(e -> {
+                    BillItem item = getTableView().getItems().get(getIndex());
+                    billingService.removeItem(currentBill, item.getProductId());
+                    refreshCart();
+                });
+            }
+
+            @Override
+            protected void updateItem(Void v, boolean empty) {
                 super.updateItem(v, empty);
                 setGraphic(empty ? null : btn);
             }
@@ -191,9 +237,11 @@ public class BillingController implements Initializable {
             boolean isSplit = rbSplit.isSelected();
             tfCashPaid.setDisable(!rbCash.isSelected() && !isSplit);
             tfCardPaid.setDisable(!rbCard.isSelected() && !isSplit);
-            tfUpiPaid.setDisable( !rbUpi.isSelected()  && !isSplit);
+            tfUpiPaid.setDisable(!rbUpi.isSelected() && !isSplit);
             if (!isSplit) {
-                tfCashPaid.setText(""); tfCardPaid.setText(""); tfUpiPaid.setText("");
+                tfCashPaid.setText("");
+                tfCardPaid.setText("");
+                tfUpiPaid.setText("");
             }
         });
     }
@@ -201,7 +249,7 @@ public class BillingController implements Initializable {
     private void updateBalance() {
         BigDecimal cash = CurrencyUtil.parse(tfCashPaid.getText());
         BigDecimal card = CurrencyUtil.parse(tfCardPaid.getText());
-        BigDecimal upi  = CurrencyUtil.parse(tfUpiPaid.getText());
+        BigDecimal upi = CurrencyUtil.parse(tfUpiPaid.getText());
         BigDecimal paid = cash.add(card).add(upi);
         BigDecimal balance = paid.subtract(currentBill.getGrandTotal());
         lblBalance.setText(CurrencyUtil.format(balance.max(BigDecimal.ZERO)));
@@ -211,7 +259,10 @@ public class BillingController implements Initializable {
 
     private void setupCustomerSearch() {
         tfCustomerSearch.textProperty().addListener((obs, o, keyword) -> {
-            if (keyword.length() < 2) { lvCustomerResults.getItems().clear(); return; }
+            if (keyword.length() < 2) {
+                lvCustomerResults.getItems().clear();
+                return;
+            }
             try (Connection conn = com.supermarketpos.db.DatabaseManager.getConnection()) {
                 List<Customer> results = customerDao.searchByName(conn, keyword);
                 lvCustomerResults.setItems(FXCollections.observableArrayList(results));
@@ -241,7 +292,10 @@ public class BillingController implements Initializable {
         tfBarcode.setOnAction(e -> searchByBarcode());
 
         tfProductSearch.textProperty().addListener((obs, o, keyword) -> {
-            if (keyword.length() < 2) { lvProductResults.getItems().clear(); return; }
+            if (keyword.length() < 2) {
+                lvProductResults.getItems().clear();
+                return;
+            }
             try (Connection conn = com.supermarketpos.db.DatabaseManager.getConnection()) {
                 List<Product> results = productDao.searchByName(conn, keyword);
                 lvProductResults.setItems(FXCollections.observableArrayList(results));
@@ -263,12 +317,12 @@ public class BillingController implements Initializable {
 
     private void searchByBarcode() {
         String raw = BarcodeUtil.normalize(tfBarcode.getText());
-        if (raw.isEmpty()) return;
+        if (raw.isEmpty())
+            return;
         try (Connection conn = com.supermarketpos.db.DatabaseManager.getConnection()) {
             productDao.findByBarcode(conn, raw).ifPresentOrElse(
-                    p  -> addProductToCart(p, 1),
-                    () -> AlertUtil.showWarning("Not Found", "No active product found for barcode: " + raw)
-            );
+                    p -> addProductToCart(p, 1),
+                    () -> AlertUtil.showWarning("Not Found", "No active product found for barcode: " + raw));
         } catch (Exception ex) {
             AlertUtil.showError("Error", "Product lookup failed.");
             log.log(Level.SEVERE, "Barcode search error.", ex);
@@ -292,7 +346,8 @@ public class BillingController implements Initializable {
     @FXML
     private void onNewBill() {
         if (currentBill.isDraft() && !currentBill.getItems().isEmpty()) {
-            if (!AlertUtil.confirm("New Bill", "Discard current bill and start a new one?")) return;
+            if (!AlertUtil.confirm("New Bill", "Discard current bill and start a new one?"))
+                return;
         }
         startNewBill();
     }
@@ -319,7 +374,7 @@ public class BillingController implements Initializable {
         PaymentMethod method = getSelectedPaymentMethod();
         BigDecimal cash = CurrencyUtil.parse(tfCashPaid.getText());
         BigDecimal card = CurrencyUtil.parse(tfCardPaid.getText());
-        BigDecimal upi  = CurrencyUtil.parse(tfUpiPaid.getText());
+        BigDecimal upi = CurrencyUtil.parse(tfUpiPaid.getText());
 
         try {
             billingService.processPayment(currentBill, method, cash, card, upi);
@@ -346,7 +401,8 @@ public class BillingController implements Initializable {
 
     @FXML
     private void onCancelBill() {
-        if (!AlertUtil.confirm("Cancel Bill", "Cancel the current bill? This cannot be undone.")) return;
+        if (!AlertUtil.confirm("Cancel Bill", "Cancel the current bill? This cannot be undone."))
+            return;
         billingService.cancelBill(currentBill);
         log.info("Bill cancelled: " + currentBill.getInvoiceNumber());
         startNewBill();
@@ -384,8 +440,7 @@ public class BillingController implements Initializable {
                                 AlertUtil.showError("Reprint Failed", e.getMessage());
                             }
                         },
-                        () -> AlertUtil.showWarning("Not Found", "Invoice not found: " + invoiceNum)
-                );
+                        () -> AlertUtil.showWarning("Not Found", "Invoice not found: " + invoiceNum));
             } catch (Exception ex) {
                 AlertUtil.showError("Error", ex.getMessage());
             }
@@ -394,7 +449,8 @@ public class BillingController implements Initializable {
 
     @FXML
     private void onClearCart() {
-        if (!AlertUtil.confirm("Clear Cart", "Remove all items from the cart?")) return;
+        if (!AlertUtil.confirm("Clear Cart", "Remove all items from the cart?"))
+            return;
         billingService.clearCart(currentBill);
         refreshCart();
     }
@@ -408,7 +464,9 @@ public class BillingController implements Initializable {
         lblSelectedCustomer.setText("Walk-in");
         tfCustomerSearch.clear();
         tfBillDiscount.clear();
-        tfCashPaid.clear(); tfCardPaid.clear(); tfUpiPaid.clear();
+        tfCashPaid.clear();
+        tfCardPaid.clear();
+        tfUpiPaid.clear();
         rbCash.setSelected(true);
         refreshCart();
     }
@@ -434,9 +492,27 @@ public class BillingController implements Initializable {
     }
 
     private PaymentMethod getSelectedPaymentMethod() {
-        if (rbCard.isSelected())  return PaymentMethod.CARD;
-        if (rbUpi.isSelected())   return PaymentMethod.UPI;
-        if (rbSplit.isSelected()) return PaymentMethod.SPLIT;
+        if (rbCard.isSelected())
+            return PaymentMethod.CARD;
+        if (rbUpi.isSelected())
+            return PaymentMethod.UPI;
+        if (rbSplit.isSelected())
+            return PaymentMethod.SPLIT;
         return PaymentMethod.CASH;
+    }
+
+    @FXML
+    private void onBackToDashboard() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/dashboard.fxml"));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) btnNewBill.getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Dashboard");
+        } catch (java.io.IOException e) {
+            log.log(Level.SEVERE, "Could not load Dashboard view", e);
+            AlertUtil.showError("Navigation Error", "Could not load Dashboard.");
+        }
     }
 }

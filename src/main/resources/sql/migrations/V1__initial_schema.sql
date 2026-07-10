@@ -88,4 +88,6 @@ VALUES ('SmartMart POS', '$', 0.00, 'light', '1.0.0');
 -- Replace the hash below with a real BCrypt hash of Admin@123 before running
 -- (see the jbcrypt scratch snippet from earlier in this conversation)
 INSERT INTO users (username, password_hash, role, is_active)
-VALUES ('admin', '$2a$12$REPLACE_WITH_REAL_BCRYPT_HASH', 'ADMIN', TRUE);
+VALUES ('admin', '$2a$12$ruZaug.65sc79Rs4ynaO0eStx3FzEkWhJuHuUpGt5/mPQv6v66Km.', 'ADMIN', TRUE);
+INSERT INTO users (username, password_hash, role, is_active)
+VALUES ('cashier', '$2a$12$GWtJoAnXPBeUczw3YlsmeusDdfKtVJt3YCjNyqiN9cmBp78ZDizii', 'CASHIER', TRUE);

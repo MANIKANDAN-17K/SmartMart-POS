@@ -31,35 +31,60 @@ public class DashboardController {
 
     private static final Logger LOGGER = LogManager.getLogger(DashboardController.class);
 
-    @FXML private Label storeNameLabel;
-    @FXML private Label loggedUserLabel;
-    @FXML private Label roleLabel;
-    @FXML private Label currentTimeLabel;
+    @FXML
+    private Label storeNameLabel;
+    @FXML
+    private Label loggedUserLabel;
+    @FXML
+    private Label roleLabel;
+    @FXML
+    private Label currentTimeLabel;
 
-    @FXML private Label todaySalesLabel;
-    @FXML private Label todayProfitLabel;
-    @FXML private Label productsCountLabel;
-    @FXML private Label customersCountLabel;
-    @FXML private Label suppliersCountLabel;
-    @FXML private Label lowStockLabel;
+    @FXML
+    private Label todaySalesLabel;
+    @FXML
+    private Label todayProfitLabel;
+    @FXML
+    private Label productsCountLabel;
+    @FXML
+    private Label customersCountLabel;
+    @FXML
+    private Label suppliersCountLabel;
+    @FXML
+    private Label lowStockLabel;
 
-    @FXML private TableView<BillDao.RecentBill> recentBillsTable;
-    @FXML private TableColumn<BillDao.RecentBill, String> invoiceColumn;
-    @FXML private TableColumn<BillDao.RecentBill, String> customerColumn;
-    @FXML private TableColumn<BillDao.RecentBill, String> amountColumn;
-    @FXML private TableColumn<BillDao.RecentBill, String> paymentTypeColumn;
-    @FXML private TableColumn<BillDao.RecentBill, String> dateColumn;
+    @FXML
+    private TableView<BillDao.RecentBill> recentBillsTable;
+    @FXML
+    private TableColumn<BillDao.RecentBill, String> invoiceColumn;
+    @FXML
+    private TableColumn<BillDao.RecentBill, String> customerColumn;
+    @FXML
+    private TableColumn<BillDao.RecentBill, String> amountColumn;
+    @FXML
+    private TableColumn<BillDao.RecentBill, String> paymentTypeColumn;
+    @FXML
+    private TableColumn<BillDao.RecentBill, String> dateColumn;
 
-    @FXML private Button refreshButton;
-    @FXML private Button logoutButton;
-    @FXML private Button newBillButton;
-    @FXML private Button productsButton;
-    @FXML private Button inventoryButton;
-    @FXML private Button purchasesButton;
-    @FXML private Button reportsButton;
-    @FXML private Button settingsButton;
+    @FXML
+    private Button refreshButton;
+    @FXML
+    private Button logoutButton;
+    @FXML
+    private Button newBillButton;
+    @FXML
+    private Button productsButton;
+    @FXML
+    private Button inventoryButton;
+    @FXML
+    private Button purchasesButton;
+    @FXML
+    private Button reportsButton;
+    @FXML
+    private Button settingsButton;
 
-    @FXML private Label appVersionLabel;
+    @FXML
+    private Label appVersionLabel;
 
     private final AuthService authService = new AuthService();
     private final SettingsService settingsService = new SettingsService();
@@ -76,11 +101,11 @@ public class DashboardController {
     private void initialize() {
         invoiceColumn.setCellValueFactory(new PropertyValueFactory<>("invoiceNumber"));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>("customerName"));
-        amountColumn.setCellValueFactory(data ->
-                new SimpleStringProperty(CurrencyUtil.format(data.getValue().getAmount(), currencySymbol)));
+        amountColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(CurrencyUtil.format(data.getValue().getAmount(), currencySymbol)));
         paymentTypeColumn.setCellValueFactory(new PropertyValueFactory<>("paymentType"));
-        dateColumn.setCellValueFactory(data ->
-                new SimpleStringProperty(DateUtil.formatDisplay(data.getValue().getDate())));
+        dateColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(DateUtil.formatDisplay(data.getValue().getDate())));
 
         loadStoreSettings();
         loadUserInfo();
@@ -145,8 +170,7 @@ public class DashboardController {
             suppliersCountLabel.setText(String.valueOf(supplierCount));
             lowStockLabel.setText(String.valueOf(lowStockCount));
 
-            ObservableList<BillDao.RecentBill> recentBills =
-                    FXCollections.observableArrayList(billDao.findRecent(5));
+            ObservableList<BillDao.RecentBill> recentBills = FXCollections.observableArrayList(billDao.findRecent(5));
             recentBillsTable.setItems(recentBills);
 
             LOGGER.info("Dashboard refreshed");
@@ -174,9 +198,32 @@ public class DashboardController {
     }
 
     private void navigateToLogin() {
-        // Scene switching belongs in MainApp / a shared navigation helper, both
-        // restricted files for this sprint. Wire this once that hook exists.
-        LOGGER.info("User logged out, navigation to Login pending MainApp wiring");
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/login.fxml"));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) logoutButton.getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Login");
+        } catch (java.io.IOException e) {
+            LOGGER.error("Navigation error to login", e);
+            AlertUtil.showError("Navigation Error", "Could not load Login view.");
+        }
+    }
+
+    private void navigateTo(String fxmlPath, String title, Button sourceButton) {
+        try {
+            stopTimers();
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource(fxmlPath));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) sourceButton.getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle(title);
+        } catch (java.io.IOException e) {
+            LOGGER.error("Navigation error to " + title, e);
+            AlertUtil.showError("Navigation Error", "Could not load " + title + " view.");
+        }
     }
 
     private void stopTimers() {
@@ -188,10 +235,33 @@ public class DashboardController {
         }
     }
 
-    @FXML private void onNewBill() { LOGGER.info("Quick action: New Bill (Billing module not yet wired)"); }
-    @FXML private void onProducts() { LOGGER.info("Quick action: Products (Product module not yet wired)"); }
-    @FXML private void onInventory() { LOGGER.info("Quick action: Inventory (Inventory module not yet wired)"); }
-    @FXML private void onPurchases() { LOGGER.info("Quick action: Purchases (Purchase module not yet wired)"); }
-    @FXML private void onReports() { LOGGER.info("Quick action: Reports (Report module not yet wired)"); }
-    @FXML private void onSettings() { LOGGER.info("Quick action: Settings (Settings module not yet wired)"); }
+    @FXML
+    private void onNewBill() {
+        navigateTo("/fxml/billing.fxml", "Billing", newBillButton);
+    }
+
+    @FXML
+    private void onProducts() {
+        navigateTo("/fxml/product.fxml", "Products", productsButton);
+    }
+
+    @FXML
+    private void onInventory() {
+        navigateTo("/fxml/inventory.fxml", "Inventory", inventoryButton);
+    }
+
+    @FXML
+    private void onPurchases() {
+        navigateTo("/fxml/purchase.fxml", "Purchases", purchasesButton);
+    }
+
+    @FXML
+    private void onReports() {
+        navigateTo("/fxml/report.fxml", "Reports", reportsButton);
+    }
+
+    @FXML
+    private void onSettings() {
+        navigateTo("/fxml/settings.fxml", "Settings", settingsButton);
+    }
 }

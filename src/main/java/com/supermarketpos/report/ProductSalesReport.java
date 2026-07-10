@@ -1,26 +1,52 @@
 package com.supermarketpos.report;
 
-public class MonthlySalesReport {
-    private int month;
-    private int year;
-    private double totalRevenue;
-    private int totalBills;
-    private double averageDailySales;
+public class ProductSalesReport {
+    private int productId;
+    private String productName;
+    private String category;
+    private int quantitySold;
+    private double revenue;
 
-    public MonthlySalesReport() {}
+    public ProductSalesReport() {
+    }
 
-    public int getMonth() { return month; }
-    public void setMonth(int month) { this.month = month; }
+    public int getProductId() {
+        return productId;
+    }
 
-    public int getYear() { return year; }
-    public void setYear(int year) { this.year = year; }
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
 
-    public double getTotalRevenue() { return totalRevenue; }
-    public void setTotalRevenue(double totalRevenue) { this.totalRevenue = totalRevenue; }
+    public String getProductName() {
+        return productName;
+    }
 
-    public int getTotalBills() { return totalBills; }
-    public void setTotalBills(int totalBills) { this.totalBills = totalBills; }
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
-    public double getAverageDailySales() { return averageDailySales; }
-    public void setAverageDailySales(double averageDailySales) { this.averageDailySales = averageDailySales; }
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public int getQuantitySold() {
+        return quantitySold;
+    }
+
+    public void setQuantitySold(int quantitySold) {
+        this.quantitySold = quantitySold;
+    }
+
+    public double getRevenue() {
+        return revenue;
+    }
+
+    public void setRevenue(double revenue) {
+        this.revenue = revenue;
+    }
 }
