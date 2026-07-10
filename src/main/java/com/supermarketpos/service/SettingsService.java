@@ -27,6 +27,45 @@ public class SettingsService {
             return defaults;
         });
     }
+    private final SettingsDao settingsDao = new SettingsDao();
+    private final AuditService auditService = new AuditService();
+
+    public StoreSettings getStoreSettings() throws SQLException {
+        return settingsDao.getStoreSettings();
+    }
+
+    public void saveStoreSettings(StoreSettings s, String username) throws Exception {
+        if (!ValidationUtil.isNotEmpty(s.getStoreName()))
+            throw new IllegalArgumentException("Store name is required.");
+        if (!ValidationUtil.isValidEmail(s.getEmail()))
+            throw new IllegalArgumentException("Invalid email address.");
+        if (!ValidationUtil.isValidPhone(s.getPhone()))
+            throw new IllegalArgumentException("Invalid phone number.");
+        if (!ValidationUtil.isValidGst(s.getGstNumber()))
+            throw new IllegalArgumentException("Invalid GST number.");
+
+        settingsDao.saveStoreSettings(s);
+        auditService.log(username, "STORE_SETTINGS_UPDATED", "Store settings updated");
+    }
+
+    public void changeTheme(String theme, String username) throws Exception {
+        if (theme == null || (!theme.equals("light") && !theme.equals("dark")))
+            throw new IllegalArgumentException("Theme selection required.");
+        settingsDao.saveTheme(theme);
+        ThemeUtil.applyTheme(theme);
+        auditService.log(username, "THEME_CHANGED", "Theme changed to " + theme);
+    }
+
+    public TaxSetting getTaxSettings() throws SQLException {
+        return settingsDao.getTaxSettings();
+    }
+
+    public void saveTaxSettings(TaxSetting t, String username) throws Exception {
+        if (t.getGstPercentage() < 0 || t.getGstPercentage() > 100)
+            throw new IllegalArgumentException("GST percentage must be between 0 and 100.");
+        settingsDao.saveTaxSettings(t);
+        auditService.log(username, "TAX_SETTINGS_UPDATED", "GST set to " + t.getGstPercentage() + "%");
+    }
 
     public StoreSettings updateSettings(StoreSettings settings) {
         return settingsDao.update(settings);

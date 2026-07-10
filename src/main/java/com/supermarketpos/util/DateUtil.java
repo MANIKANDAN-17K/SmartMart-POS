@@ -22,4 +22,15 @@ public class DateUtil {
     public static String now() {
         return LocalDateTime.now().format(DT_FMT);
     }
+    private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    private DateUtil() {}
+
+    public static String format(LocalDate date) {
+        return date != null ? date.format(DISPLAY_FORMAT) : "";
+    }
+
+    public static LocalDate parse(String text) {
+        return (text != null && !text.isBlank()) ? LocalDate.parse(text, DISPLAY_FORMAT) : null;
+    }
 }

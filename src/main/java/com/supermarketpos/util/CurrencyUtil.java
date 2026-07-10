@@ -27,4 +27,11 @@ public class CurrencyUtil {
             return BigDecimal.ZERO;
         }
     }
+    private static final NumberFormat FORMAT = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+
+    private CurrencyUtil() {}
+
+    public static String format(double amount) {
+        return FORMAT.format(amount);
+    }
 }

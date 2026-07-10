@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.supermarketpos.controller.ReportController"
+            stylesheets="@../css/common.css"
+            prefWidth="1100" prefHeight="750">
+
+    <!-- TOP: Title + Report Selector -->
+    <top>
+        <VBox styleClass="top-bar" spacing="8">
+            <padding><Insets topRightBottomLeft="12"/></padding>
+            <Label text="Reports &amp; Analytics" styleClass="page-title"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Report Type:"/>
+                <ComboBox fx:id="cmbReportType" prefWidth="220"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- CENTER: Filters + Cards + Table -->
+    <center>
+        <VBox spacing="10">
+            <padding><Insets top="10" right="14" bottom="10" left="14"/></padding>
+
+            <!-- Filter Panel -->
+            <HBox fx:id="filterPanel" spacing="12" alignment="CENTER_LEFT" styleClass="filter-panel">
+                <padding><Insets topRightBottomLeft="8"/></padding>
+                <DatePicker fx:id="dpSingleDate" promptText="Select Date"/>
+                <DatePicker fx:id="dpStartDate" promptText="Start Date"/>
+                <DatePicker fx:id="dpEndDate" promptText="End Date"/>
+                <ComboBox fx:id="cmbMonth" promptText="Month" prefWidth="120"/>
+                <ComboBox fx:id="cmbYear" promptText="Year" prefWidth="90"/>
+                <ComboBox fx:id="cmbCategory" promptText="Category" prefWidth="130"/>
+                <ComboBox fx:id="cmbSupplier" promptText="Supplier" prefWidth="150"/>
+                <ComboBox fx:id="cmbStockStatus" promptText="Stock Status" prefWidth="130"/>
+                <TextField fx:id="txtProductSearch" promptText="Search Product..." prefWidth="150"/>
+            </HBox>
+
+            <!-- Summary Cards -->
+            <HBox spacing="10">
+                <VBox styleClass="summary-card" fx:id="card1">
+                    <Label fx:id="lblCard1Title" styleClass="card-title"/>
+                    <Label fx:id="lblCard1Value" styleClass="card-value"/>
+                </VBox>
+                <VBox styleClass="summary-card" fx:id="card2">
+                    <Label fx:id="lblCard2Title" styleClass="card-title"/>
+                    <Label fx:id="lblCard2Value" styleClass="card-value"/>
+                </VBox>
+                <VBox styleClass="summary-card" fx:id="card3">
+                    <Label fx:id="lblCard3Title" styleClass="card-title"/>
+                    <Label fx:id="lblCard3Value" styleClass="card-value"/>
+                </VBox>
+                <VBox styleClass="summary-card" fx:id="card4">
+                    <Label fx:id="lblCard4Title" styleClass="card-title"/>
+                    <Label fx:id="lblCard4Value" styleClass="card-value"/>
+                </VBox>
+                <VBox styleClass="summary-card" fx:id="card5">
+                    <Label fx:id="lblCard5Title" styleClass="card-title"/>
+                    <Label fx:id="lblCard5Value" styleClass="card-value"/>
+                </VBox>
+            </HBox>
+
+            <!-- Search Bar -->
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Label text="Search:"/>
+                <TextField fx:id="txtSearch" promptText="Search records..." prefWidth="300"/>
+            </HBox>
+
+            <!-- Report Table -->
+            <TableView fx:id="tblReport" VBox.vgrow="ALWAYS" styleClass="report-table"/>
+
+        </VBox>
+    </center>
+
+    <!-- BOTTOM: Action Toolbar -->
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="action-toolbar">
+            <padding><Insets topRightBottomLeft="10"/></padding>
+            <Button fx:id="btnClearFilters" text="Clear Filters" onAction="#onClearFilters" styleClass="btn-secondary"/>
+            <Button fx:id="btnRefresh"      text="Refresh"       onAction="#onRefresh"      styleClass="btn-secondary"/>
+            <Button fx:id="btnGenerate"     text="Generate"      onAction="#onGenerate"     styleClass="btn-primary"/>
+            <Button fx:id="btnExportExcel"  text="Export Excel"  onAction="#onExportExcel"  styleClass="btn-success"/>
+            <Button fx:id="btnPrint"        text="Print"         onAction="#onPrint"        styleClass="btn-info"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

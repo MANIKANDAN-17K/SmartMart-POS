@@ -116,7 +116,151 @@ public class BillDao {
         }
         return result;
     }
+    private static final Logger LOGGER = Logger.getLogger(BillDao.class.getName());
 
+    public DailySalesReport getDailySalesReport(LocalDate date) {
+        DailySalesReport report = new DailySalesReport();
+        report.setDate(date);
+        String sql = """
+            SELECT
+                COUNT(*) AS total_bills,
+                COALESCE(SUM(total_amount), 0) AS total_sales,
+                COALESCE(SUM(gst_amount), 0) AS total_gst,
+                COALESCE(SUM(discount_amount), 0) AS total_discount,
+                COALESCE(AVG(total_amount), 0) AS avg_bill
+            FROM bills
+            WHERE DATE(bill_date) = ?
+            """;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(date));
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                report.setTotalBills(rs.getInt("total_bills"));
+                report.setTotalSales(rs.getDouble("total_sales"));
+                report.setTotalGst(rs.getDouble("total_gst"));
+                report.setTotalDiscount(rs.getDouble("total_discount"));
+                report.setAverageBillValue(rs.getDouble("avg_bill"));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching daily sales report", e);
+        }
+        return report;
+    }
+
+    public MonthlySalesReport getMonthlySalesReport(int month, int year) {
+        MonthlySalesReport report = new MonthlySalesReport();
+        report.setMonth(month);
+        report.setYear(year);
+        String sql = """
+            SELECT
+                COUNT(*) AS total_bills,
+                COALESCE(SUM(total_amount), 0) AS total_revenue
+            FROM bills
+            WHERE MONTH(bill_date) = ? AND YEAR(bill_date) = ?
+            """;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, month);
+            ps.setInt(2, year);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                report.setTotalBills(rs.getInt("total_bills"));
+                report.setTotalRevenue(rs.getDouble("total_revenue"));
+                int daysInMonth = LocalDate.of(year, month, 1).lengthOfMonth();
+                report.setAverageDailySales(report.getTotalRevenue() / daysInMonth);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching monthly sales report", e);
+        }
+        return report;
+    }
+
+    public List<ProfitReport> getProfitReport(LocalDate startDate, LocalDate endDate) {
+        List<ProfitReport> list = new ArrayList<>();
+        String sql = """
+            SELECT
+                DATE(b.bill_date) AS report_date,
+                COALESCE(SUM(b.total_amount), 0) AS revenue,
+                COALESCE(SUM(bi.quantity * p.purchase_price), 0) AS cost
+            FROM bills b
+            JOIN bill_items bi ON b.id = bi.bill_id
+            JOIN products p ON bi.product_id = p.id
+            WHERE DATE(b.bill_date) BETWEEN ? AND ?
+            GROUP BY DATE(b.bill_date)
+            ORDER BY report_date
+            """;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(startDate));
+            ps.setDate(2, Date.valueOf(endDate));
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ProfitReport r = new ProfitReport();
+                r.setDate(rs.getDate("report_date").toLocalDate());
+                double revenue = rs.getDouble("revenue");
+                double cost = rs.getDouble("cost");
+                double profit = revenue - cost;
+                double pct = revenue > 0 ? (profit / revenue) * 100 : 0;
+                r.setRevenue(revenue);
+                r.setCost(cost);
+                r.setGrossProfit(profit);
+                r.setProfitPercentage(pct);
+                list.add(r);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching profit report", e);
+        }
+        return list;
+    }
+
+    public List<ProductSalesReport> getProductSalesReport(LocalDate startDate, LocalDate endDate,
+                                                          String category, String productName) {
+        List<ProductSalesReport> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+            SELECT
+                p.id AS product_id,
+                p.name AS product_name,
+                p.category AS category,
+                COALESCE(SUM(bi.quantity), 0) AS quantity_sold,
+                COALESCE(SUM(bi.quantity * bi.unit_price), 0) AS revenue
+            FROM bill_items bi
+            JOIN products p ON bi.product_id = p.id
+            JOIN bills b ON bi.bill_id = b.id
+            WHERE DATE(b.bill_date) BETWEEN ? AND ?
+            """);
+        List<Object> params = new ArrayList<>();
+        params.add(Date.valueOf(startDate));
+        params.add(Date.valueOf(endDate));
+        if (category != null && !category.isEmpty() && !category.equals("All")) {
+            sql.append(" AND p.category = ?");
+            params.add(category);
+        }
+        if (productName != null && !productName.isEmpty()) {
+            sql.append(" AND p.name LIKE ?");
+            params.add("%" + productName + "%");
+        }
+        sql.append(" GROUP BY p.id, p.name, p.category ORDER BY quantity_sold DESC");
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ProductSalesReport r = new ProductSalesReport();
+                r.setProductId(rs.getInt("product_id"));
+                r.setProductName(rs.getString("product_name"));
+                r.setCategory(rs.getString("category"));
+                r.setQuantitySold(rs.getInt("quantity_sold"));
+                r.setRevenue(rs.getDouble("revenue"));
+                list.add(r);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching product sales report", e);
+        }
+        return list;
+    }
     private Bill mapRow(ResultSet rs) throws SQLException {
         Bill b = new Bill();
         b.setId(rs.getInt("id"));

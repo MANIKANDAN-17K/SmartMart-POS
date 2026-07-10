@@ -1,5 +1,7 @@
 package com.supermarketpos.util;
 
+import java.util.regex.Pattern;
+
 import static com.mysql.cj.util.StringUtils.isNullOrEmpty;
 
 public final class ValidationUtil {
@@ -103,6 +105,33 @@ public final class ValidationUtil {
 
         public static String sanitize(String value) {
             return value == null ? "" : value.trim();
+        }
+        public static boolean isValidDateRange(LocalDate start, LocalDate end) {
+            return start != null && end != null && !start.isAfter(end);
+        }
+
+        public static boolean isNotBlank(String value) {
+            return value != null && !value.isBlank();
+        }
+        private static final Pattern EMAIL_PATTERN =
+                Pattern.compile("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$");
+        private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{10}$");
+        private static final Pattern GST_PATTERN = Pattern.compile("^[0-9A-Z]{15}$");
+
+        public static boolean isNotEmpty(String value) {
+            return value != null && !value.trim().isEmpty();
+        }
+
+        public static boolean isValidEmail(String email) {
+            return isNotEmpty(email) && EMAIL_PATTERN.matcher(email).matches();
+        }
+
+        public static boolean isValidPhone(String phone) {
+            return isNotEmpty(phone) && PHONE_PATTERN.matcher(phone).matches();
+        }
+
+        public static boolean isValidGst(String gst) {
+            return isNotEmpty(gst) && GST_PATTERN.matcher(gst).matches();
         }
     }
 }

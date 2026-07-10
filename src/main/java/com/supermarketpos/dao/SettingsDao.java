@@ -2,6 +2,7 @@ package com.supermarketpos.dao;
 
 import com.supermarketpos.database.DatabaseInitializer;
 import com.supermarketpos.model.StoreSettings;
+import com.supermarketpos.model.TaxSetting;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -50,5 +51,60 @@ public class SettingsDao {
                 rs.getString("theme"),
                 rs.getString("app_version")
         );
+    }
+    public void saveStoreSettings(StoreSettings s) throws SQLException {
+        String sql = "UPDATE settings SET store_name=?, address=?, gst_number=?, phone=?, email=?, " +
+                "logo_path=?, receipt_header=?, receipt_footer=?, show_logo_on_receipt=?, " +
+                "show_gst_on_receipt=?, show_cashier_on_receipt=? WHERE id = 1";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, s.getStoreName());
+            ps.setString(2, s.getAddress());
+            ps.setString(3, s.getGstNumber());
+            ps.setString(4, s.getPhone());
+            ps.setString(5, s.getEmail());
+            ps.setString(6, s.getLogoPath());
+            ps.setString(7, s.getReceiptHeader());
+            ps.setString(8, s.getReceiptFooter());
+            ps.setBoolean(9, s.isShowLogoOnReceipt());
+            ps.setBoolean(10, s.isShowGstOnReceipt());
+            ps.setBoolean(11, s.isShowCashierOnReceipt());
+            ps.executeUpdate();
+        }
+    }
+
+    public void saveTheme(String theme) throws SQLException {
+        String sql = "UPDATE settings SET theme=? WHERE id = 1";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, theme);
+            ps.executeUpdate();
+        }
+    }
+
+    public TaxSetting getTaxSettings() throws SQLException {
+        String sql = "SELECT * FROM tax_settings WHERE id = 1";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                TaxSetting t = new TaxSetting();
+                t.setId(rs.getInt("id"));
+                t.setGstPercentage(rs.getDouble("gst_percentage"));
+                t.setGstEnabled(rs.getBoolean("gst_enabled"));
+                return t;
+            }
+            return null;
+        }
+    }
+
+    public void saveTaxSettings(TaxSetting t) throws SQLException {
+        String sql = "UPDATE tax_settings SET gst_percentage=?, gst_enabled=? WHERE id = 1";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDouble(1, t.getGstPercentage());
+            ps.setBoolean(2, t.isGstEnabled());
+            ps.executeUpdate();
+        }
     }
 }

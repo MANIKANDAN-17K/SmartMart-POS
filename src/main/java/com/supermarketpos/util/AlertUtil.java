@@ -62,4 +62,15 @@ public final class AlertUtil {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    public static void showInfo(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, message);
+        alert.setHeaderText(null);
+        alert.showAndWait();
+    }
+
+    public static void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, message);
+        alert.setHeaderText(null);
+        alert.showAndWait();
+    }
 }

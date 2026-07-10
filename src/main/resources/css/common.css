@@ -56,3 +56,52 @@
 .btn-danger:hover    { -fx-background-color: #b91c1c; }
 .btn-secondary:hover { -fx-background-color: #475569; }
 .button:disabled     { -fx-opacity: 0.45; }
+
+/* ── Report Module ──────────────────────────── */
+.page-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.filter-panel {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.summary-card {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 12 18 12 18;
+    -fx-pref-width: 180;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);
+}
+
+.card-title {
+    -fx-font-size: 12px;
+    -fx-text-fill: #757575;
+}
+
+.card-value {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+}
+
+.report-table {
+    -fx-border-color: #e0e0e0;
+}
+
+.action-toolbar {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+}
+
+.btn-primary   { -fx-background-color: #1976D2; -fx-text-fill: white; -fx-cursor: hand; }
+.btn-secondary { -fx-background-color: #757575; -fx-text-fill: white; -fx-cursor: hand; }
+.btn-success   { -fx-background-color: #388E3C; -fx-text-fill: white; -fx-cursor: hand; }
+.btn-info      { -fx-background-color: #0288D1; -fx-text-fill: white; -fx-cursor: hand; }
