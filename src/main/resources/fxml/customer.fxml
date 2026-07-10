@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.supermarketpos.controller.CustomerController"
+            stylesheets="@../css/common.css"
+            prefWidth="1200" prefHeight="780">
+
+    <!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
+    <top>
+        <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="16">
+            <Label text="Customer Management" styleClass="page-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="tfSearch" promptText="Search by name or mobile…" prefWidth="260"/>
+            <Button text="Search"  onAction="#onSearch"  styleClass="btn-primary"/>
+            <Button text="Refresh" onAction="#onRefresh" styleClass="btn-secondary"/>
+        </HBox>
+    </top>
+
+    <!-- ══ MAIN ════════════════════════════════════════════════════════════ -->
+    <center>
+        <HBox spacing="12" style="-fx-padding:12;">
+
+            <!-- LEFT: form + buttons ──────────────────────────────────────── -->
+            <VBox spacing="10" prefWidth="280" styleClass="side-panel">
+                <Label fx:id="lblFormTitle" text="New Customer" styleClass="section-title"/>
+
+                <Label text="Name *" styleClass="field-label"/>
+                <TextField fx:id="tfName" promptText="Full name"/>
+
+                <Label text="Mobile *" styleClass="field-label"/>
+                <TextField fx:id="tfPhone" promptText="e.g. 9876543210"/>
+
+                <Label text="Email" styleClass="field-label"/>
+                <TextField fx:id="tfEmail" promptText="optional"/>
+
+                <Label text="Address" styleClass="field-label"/>
+                <TextArea fx:id="taAddress" promptText="optional" prefRowCount="3" wrapText="true"/>
+
+                <Separator/>
+
+                <HBox spacing="8">
+                    <Button fx:id="btnAdd"    text="Add"    onAction="#onAdd"    styleClass="btn-success" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Button fx:id="btnUpdate" text="Update" onAction="#onUpdate" styleClass="btn-primary"  HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
+                </HBox>
+                <HBox spacing="8">
+                    <Button fx:id="btnActivate"   text="Activate"   onAction="#onActivate"   styleClass="btn-success-outline" HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
+                    <Button fx:id="btnDeactivate" text="Deactivate" onAction="#onDeactivate" styleClass="btn-danger-outline"  HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
+                </HBox>
+                <Button fx:id="btnViewHistory" text="View Purchase History" onAction="#onViewHistory"
+                        styleClass="btn-secondary" maxWidth="Infinity" disable="true"/>
+                <Button text="Clear" onAction="#onClear" styleClass="btn-sm" maxWidth="Infinity"/>
+
+                <Separator/>
+
+                <!-- Customer summary card -->
+                <VBox styleClass="summary-card" spacing="5">
+                    <Label text="Selected Customer" styleClass="section-title"/>
+                    <Label fx:id="lblSummaryName"    text="—" styleClass="summary-value-lg"/>
+                    <Label fx:id="lblSummaryPhone"   text="—" styleClass="label-muted"/>
+                    <Label fx:id="lblSummaryEmail"   text="—" styleClass="label-muted"/>
+                    <Label fx:id="lblSummaryAddress" text="—" styleClass="label-muted" wrapText="true"/>
+                    <HBox spacing="6" alignment="CENTER_LEFT">
+                        <Label text="Status:" styleClass="label-muted"/>
+                        <Label fx:id="lblSummaryStatus" text="—"/>
+                    </HBox>
+                    <HBox spacing="6" alignment="CENTER_LEFT">
+                        <Label text="Joined:" styleClass="label-muted"/>
+                        <Label fx:id="lblSummaryJoined" text="—" styleClass="label-muted"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- RIGHT: tables ─────────────────────────────────────────────── -->
+            <VBox spacing="10" HBox.hgrow="ALWAYS">
+
+                <!-- Customer table -->
+                <TableView fx:id="tblCustomers" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colName"      text="Name"         prefWidth="200"/>
+                        <TableColumn fx:id="colPhone"     text="Mobile"       prefWidth="130"/>
+                        <TableColumn fx:id="colEmail"     text="Email"        prefWidth="200"/>
+                        <TableColumn fx:id="colStatus"    text="Status"       prefWidth="90"/>
+                        <TableColumn fx:id="colCreatedAt" text="Registered"   prefWidth="160"/>
+                    </columns>
+                    <placeholder><Label text="No customers found. Add one using the form."/></placeholder>
+                </TableView>
+
+                <!-- Purchase history (hidden until requested) -->
+                <VBox fx:id="pnlHistory" spacing="8" styleClass="history-panel">
+                    <Label text="Purchase History" styleClass="section-title"/>
+                    <TableView fx:id="tblHistory" prefHeight="240">
+                        <columns>
+                            <TableColumn fx:id="colHInvoice" text="Invoice #"       prefWidth="160"/>
+                            <TableColumn fx:id="colHDate"    text="Date"            prefWidth="150"/>
+                            <TableColumn fx:id="colHItems"   text="Items"           prefWidth="70"  style="-fx-alignment:CENTER_RIGHT;"/>
+                            <TableColumn fx:id="colHTotal"   text="Grand Total"     prefWidth="120" style="-fx-alignment:CENTER_RIGHT;"/>
+                            <TableColumn fx:id="colHPayment" text="Payment"         prefWidth="100"/>
+                            <TableColumn fx:id="colHCashier" text="Cashier"         prefWidth="130"/>
+                        </columns>
+                        <placeholder><Label text="No purchases found for this customer."/></placeholder>
+                    </TableView>
+                </VBox>
+
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

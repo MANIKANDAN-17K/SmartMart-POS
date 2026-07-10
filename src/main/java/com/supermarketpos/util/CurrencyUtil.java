@@ -1,17 +1,30 @@
 package com.supermarketpos.util;
 
-import java.text.DecimalFormat;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
 
-public final class CurrencyUtil {
+public class CurrencyUtil {
 
-    private static final DecimalFormat FORMAT = new DecimalFormat("#,##0.00");
+    private static final Locale INDIA = new Locale("en", "IN");
+    private static final NumberFormat FORMAT = NumberFormat.getCurrencyInstance(INDIA);
 
-    private CurrencyUtil() {
+    private CurrencyUtil() {}
+
+    /** Returns "₹1,234.56" style string. */
+    public static String format(BigDecimal amount) {
+        if (amount == null) return FORMAT.format(BigDecimal.ZERO);
+        return FORMAT.format(amount);
     }
 
-    /** Formats an amount with the given symbol, clamping negatives to zero per business rules. */
-    public static String format(double amount, String currencySymbol) {
-        double safeAmount = Math.max(amount, 0);
-        return currencySymbol + FORMAT.format(safeAmount);
+    /** Safe parse — returns ZERO on null or empty input. */
+    public static BigDecimal parse(String value) {
+        if (value == null || value.isBlank()) return BigDecimal.ZERO;
+        try {
+            String clean = value.replaceAll("[^\\d.]", "");
+            return new BigDecimal(clean);
+        } catch (NumberFormatException e) {
+            return BigDecimal.ZERO;
+        }
     }
 }

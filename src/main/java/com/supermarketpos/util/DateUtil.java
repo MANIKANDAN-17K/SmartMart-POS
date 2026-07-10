@@ -1,30 +1,25 @@
 package com.supermarketpos.util;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public final class DateUtil {
+public class DateUtil {
 
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+    private static final DateTimeFormatter DT_FMT  = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    private DateUtil() {
+    private DateUtil() {}
+
+    public static String formatDateTime(LocalDateTime dt) {
+        return dt != null ? dt.format(DT_FMT) : "";
     }
 
-    public static String formatDate(LocalDateTime dateTime) {
-        return dateTime == null ? "-" : dateTime.format(DATE_FORMAT);
+    public static String formatDate(LocalDate d) {
+        return d != null ? d.format(DATE_FMT) : "";
     }
 
-    public static String formatDateTime(LocalDateTime dateTime) {
-        return dateTime == null ? "-" : dateTime.format(DATE_TIME_FORMAT);
-    }
-
-    public static String formatDisplay(LocalDateTime dateTime) {
-        return dateTime == null ? "-" : dateTime.format(DISPLAY_FORMAT);
-    }
-
-    public static String nowDisplay() {
-        return LocalDateTime.now().format(DISPLAY_FORMAT);
+    public static String now() {
+        return LocalDateTime.now().format(DT_FMT);
     }
 }

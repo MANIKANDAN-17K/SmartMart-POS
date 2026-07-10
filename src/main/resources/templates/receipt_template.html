@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt – {{INVOICE_NUMBER}}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Courier New', monospace; font-size: 12px;
+            max-width: 320px; margin: 0 auto; padding: 16px; }
+        .shop-name { text-align: center; font-size: 18px; font-weight: bold;
+            letter-spacing: 2px; margin-bottom: 2px; }
+        .shop-sub  { text-align: center; font-size: 11px; color: #555; margin-bottom: 8px; }
+        .divider   { border-top: 1px dashed #000; margin: 6px 0; }
+        .meta      { font-size: 11px; }
+        .meta td   { padding: 1px 0; }
+        table.items { width: 100%; border-collapse: collapse; margin: 8px 0; }
+        table.items th { border-bottom: 1px solid #000; padding: 3px 2px;
+            text-align: left; font-size: 11px; }
+        table.items td { padding: 3px 2px; font-size: 11px; }
+        .right     { text-align: right; }
+        .summary   { width: 100%; }
+        .summary td { padding: 2px 0; }
+        .total-row { font-size: 14px; font-weight: bold; border-top: 1px solid #000;
+            padding-top: 4px !important; }
+        .thanks    { text-align: center; margin-top: 14px; font-size: 12px;
+            font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="shop-name">SMARTMART</div>
+<div class="shop-sub">Your Neighbourhood Supermarket</div>
+<div class="divider"></div>
+
+<table class="meta">
+    <tr><td>Invoice</td><td>:</td><td><b>{{INVOICE_NUMBER}}</b></td></tr>
+    <tr><td>Date</td><td>:</td><td>{{DATE_TIME}}</td></tr>
+    <tr><td>Cashier</td><td>:</td><td>{{CASHIER}}</td></tr>
+    <tr><td>Customer</td><td>:</td><td>{{CUSTOMER}}</td></tr>
+</table>
+
+<div class="divider"></div>
+
+<table class="items">
+    <thead>
+    <tr>
+        <th>Item</th>
+        <th class="right">Qty</th>
+        <th class="right">Rate</th>
+        <th class="right">GST</th>
+        <th class="right">Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{ITEMS_ROWS}}
+    </tbody>
+</table>
+
+<div class="divider"></div>
+
+<table class="summary">
+    <tr><td>Items</td><td class="right">{{ITEM_COUNT}}</td></tr>
+    <tr><td>Subtotal</td><td class="right">{{SUBTOTAL}}</td></tr>
+    <tr><td>Discount</td><td class="right">- {{DISCOUNT}}</td></tr>
+    <tr><td>GST</td><td class="right">{{GST}}</td></tr>
+    <tr class="total-row"><td>Grand Total</td><td class="right">{{GRAND_TOTAL}}</td></tr>
+    <tr><td>Amount Paid ({{PAYMENT_METHOD}})</td><td class="right">{{AMOUNT_PAID}}</td></tr>
+    <tr><td>Change</td><td class="right">{{BALANCE}}</td></tr>
+</table>
+
+<div class="divider"></div>
+<p class="thanks">Thank you for shopping at SmartMart!<br>Visit again 🛒</p>
+
+</body>
+</html>

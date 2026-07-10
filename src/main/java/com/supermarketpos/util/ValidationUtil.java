@@ -91,5 +91,18 @@ public final class ValidationUtil {
             if (isNullOrEmpty(gstNumber)) return true; // optional field
             return GST_PATTERN.matcher(gstNumber.trim().toUpperCase()).matches();
         }
+        public static void requireTrue(boolean condition, String message) {
+            if (!condition) throw new IllegalArgumentException(message);
+        }
+
+        public static void requireNonBlank(String value, String fieldName) {
+            if (value == null || value.isBlank()) {
+                throw new IllegalArgumentException(fieldName + " must not be blank.");
+            }
+        }
+
+        public static String sanitize(String value) {
+            return value == null ? "" : value.trim();
+        }
     }
 }

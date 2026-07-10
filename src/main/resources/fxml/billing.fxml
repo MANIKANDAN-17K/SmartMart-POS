@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.supermarketpos.controller.BillingController"
+            stylesheets="@../css/billing.css"
+            prefWidth="1280" prefHeight="800">
+
+    <!-- ══ TOP HEADER ══════════════════════════════════════════════════════ -->
+    <top>
+        <HBox styleClass="header-bar" spacing="20" alignment="CENTER_LEFT">
+            <Label text="SmartMart POS" styleClass="logo-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <VBox alignment="CENTER">
+                <Label text="Invoice" styleClass="label-muted"/>
+                <Label fx:id="lblInvoiceNumber" styleClass="invoice-number"/>
+            </VBox>
+            <VBox alignment="CENTER">
+                <Label text="Cashier" styleClass="label-muted"/>
+                <Label fx:id="lblCashier" styleClass="header-value"/>
+            </VBox>
+            <VBox alignment="CENTER">
+                <Label text="Date &amp; Time" styleClass="label-muted"/>
+                <Label fx:id="lblDateTime" styleClass="header-value"/>
+            </VBox>
+            <Button fx:id="btnNewBill" text="+ New Bill"
+                    styleClass="btn-primary" onAction="#onNewBill"/>
+        </HBox>
+    </top>
+
+    <!-- ══ MAIN CONTENT ════════════════════════════════════════════════════ -->
+    <center>
+        <HBox spacing="12" style="-fx-padding:12;">
+
+            <!-- LEFT: product search + cart ─────────────────────────────── -->
+            <VBox spacing="10" HBox.hgrow="ALWAYS">
+
+                <!-- Customer + product search row -->
+                <HBox spacing="10">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Customer (optional)" styleClass="field-label"/>
+                        <TextField fx:id="tfCustomerSearch" promptText="Search by name or phone…"/>
+                        <ListView fx:id="lvCustomerResults" prefHeight="120" visible="false"/>
+                        <Label fx:id="lblSelectedCustomer" text="Walk-in" styleClass="label-muted"/>
+                    </VBox>
+                    <VBox spacing="4">
+                        <Label text="Barcode" styleClass="field-label"/>
+                        <TextField fx:id="tfBarcode" promptText="Scan or type…" prefWidth="180"/>
+                    </VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Product Search" styleClass="field-label"/>
+                        <TextField fx:id="tfProductSearch" promptText="Search by name…"/>
+                        <ListView fx:id="lvProductResults" prefHeight="120" visible="false"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Cart table -->
+                <TableView fx:id="tblCart" VBox.vgrow="ALWAYS" styleClass="cart-table">
+                    <columns>
+                        <TableColumn fx:id="colBarcode"  text="Barcode"    prefWidth="110"/>
+                        <TableColumn fx:id="colProduct"  text="Product"    prefWidth="200"/>
+                        <TableColumn fx:id="colPrice"    text="Price"      prefWidth="90" style="-fx-alignment:CENTER_RIGHT;"/>
+                        <TableColumn fx:id="colQty"      text="Qty"        prefWidth="90" style="-fx-alignment:CENTER_RIGHT;"/>
+                        <TableColumn fx:id="colDiscount" text="Discount"   prefWidth="90" style="-fx-alignment:CENTER_RIGHT;"/>
+                        <TableColumn fx:id="colGst"      text="GST"        prefWidth="80" style="-fx-alignment:CENTER_RIGHT;"/>
+                        <TableColumn fx:id="colLineTotal" text="Total"     prefWidth="100" style="-fx-alignment:CENTER_RIGHT;"/>
+                        <TableColumn fx:id="colRemove"   text=""           prefWidth="50"/>
+                    </columns>
+                    <placeholder><Label text="No items — scan a product to begin"/></placeholder>
+                </TableView>
+
+                <!-- Cart action buttons -->
+                <HBox spacing="10">
+                    <Button fx:id="btnClearCart" text="Clear Cart"
+                            styleClass="btn-danger-outline" onAction="#onClearCart"/>
+                </HBox>
+            </VBox>
+
+            <!-- RIGHT: summary + payment ─────────────────────────────────── -->
+            <VBox spacing="12" prefWidth="320" styleClass="right-panel">
+
+                <!-- Summary -->
+                <VBox styleClass="summary-card" spacing="6">
+                    <Label text="Bill Summary" styleClass="section-title"/>
+                    <HBox><Label text="Items" HBox.hgrow="ALWAYS"/><Label fx:id="lblItemCount" text="0"/></HBox>
+                    <HBox><Label text="Subtotal" HBox.hgrow="ALWAYS"/><Label fx:id="lblSubtotal" text="₹0.00"/></HBox>
+                    <HBox spacing="6">
+                        <Label text="Bill Discount (₹)" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="tfBillDiscount" prefWidth="80" promptText="0.00"/>
+                        <Button text="Apply" onAction="#onApplyBillDiscount" styleClass="btn-sm"/>
+                    </HBox>
+                    <HBox><Label text="GST" HBox.hgrow="ALWAYS"/><Label fx:id="lblGst" text="₹0.00"/></HBox>
+                    <Separator/>
+                    <HBox styleClass="grand-total-row">
+                        <Label text="Grand Total" HBox.hgrow="ALWAYS" styleClass="grand-total-label"/>
+                        <Label fx:id="lblGrandTotal" text="₹0.00" styleClass="grand-total-value"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Payment -->
+                <VBox styleClass="payment-card" spacing="8">
+                    <Label text="Payment" styleClass="section-title"/>
+                    <HBox spacing="10">
+                        <RadioButton fx:id="rbCash"  text="Cash"  toggleGroup="$tgPayment"/>
+                        <RadioButton fx:id="rbCard"  text="Card"  toggleGroup="$tgPayment"/>
+                        <RadioButton fx:id="rbUpi"   text="UPI"   toggleGroup="$tgPayment"/>
+                        <RadioButton fx:id="rbSplit" text="Split" toggleGroup="$tgPayment"/>
+                        <fx:define><ToggleGroup fx:id="tgPayment"/></fx:define>
+                    </HBox>
+                    <GridPane hgap="8" vgap="6">
+                        <Label text="Cash ₹"   GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <TextField fx:id="tfCashPaid" promptText="0.00"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="120"/>
+                        <Label text="Card ₹"   GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <TextField fx:id="tfCardPaid" promptText="0.00" disable="true"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Label text="UPI ₹"    GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <TextField fx:id="tfUpiPaid"  promptText="0.00" disable="true"
+                                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        <Label text="Balance ₹" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <Label fx:id="lblBalance" text="₹0.00" styleClass="balance-label"
+                               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                    </GridPane>
+                </VBox>
+
+                <!-- Action buttons -->
+                <VBox spacing="8">
+                    <Button fx:id="btnCompleteBill"   text="✔ Complete Bill"
+                            styleClass="btn-success" maxWidth="Infinity" onAction="#onCompleteBill"/>
+                    <Button fx:id="btnPrintReceipt"   text="🖨 Print Receipt"
+                            styleClass="btn-primary" maxWidth="Infinity" onAction="#onPrintReceipt" disable="true"/>
+                    <Button fx:id="btnReprintReceipt" text="↺ Reprint Receipt"
+                            styleClass="btn-secondary" maxWidth="Infinity" onAction="#onReprintReceipt"/>
+                    <Button fx:id="btnCancelBill"     text="✕ Cancel Bill"
+                            styleClass="btn-danger" maxWidth="Infinity" onAction="#onCancelBill"/>
+                </VBox>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.supermarketpos.controller.InventoryController"
+            stylesheets="@../css/common.css">
+
+    <top>
+        <VBox spacing="10">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+
+            <HBox spacing="15">
+                <VBox alignment="CENTER" styleClass="summary-card">
+                    <Label text="Total Products" style="-fx-font-size: 11px;"/>
+                    <Label fx:id="totalProductsLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox alignment="CENTER" styleClass="summary-card">
+                    <Label text="Total Stock Items" style="-fx-font-size: 11px;"/>
+                    <Label fx:id="totalStockItemsLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox alignment="CENTER" styleClass="summary-card">
+                    <Label text="Low Stock" style="-fx-font-size: 11px;"/>
+                    <Label fx:id="lowStockCountLabel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: orange;"/>
+                </VBox>
+                <VBox alignment="CENTER" styleClass="summary-card">
+                    <Label text="Out of Stock" style="-fx-font-size: 11px;"/>
+                    <Label fx:id="outOfStockCountLabel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: red;"/>
+                </VBox>
+            </HBox>
+
+            <ToolBar>
+                <items>
+                    <TextField fx:id="searchField" promptText="Search by name / barcode / SKU..." onAction="#handleSearch"/>
+                    <Button fx:id="searchButton" text="Search" onAction="#handleSearch"/>
+                    <Label text="Category:"/>
+                    <ComboBox fx:id="categoryFilter" onAction="#handleCategoryFilterChange"/>
+                    <Label text="Status:"/>
+                    <ComboBox fx:id="statusFilter" onAction="#handleStatusFilterChange"/>
+                    <Button fx:id="refreshButton" text="Refresh" onAction="#handleRefresh"/>
+                </items>
+            </ToolBar>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="inventoryTable">
+            <columns>
+                <TableColumn fx:id="barcodeColumn" text="Barcode" prefWidth="110"/>
+                <TableColumn fx:id="skuColumn" text="SKU" prefWidth="90"/>
+                <TableColumn fx:id="nameColumn" text="Product Name" prefWidth="180"/>
+                <TableColumn fx:id="categoryColumn" text="Category" prefWidth="110"/>
+                <TableColumn fx:id="currentStockColumn" text="Current Stock" prefWidth="100"/>
+                <TableColumn fx:id="minStockColumn" text="Minimum Stock" prefWidth="100"/>
+                <TableColumn fx:id="statusColumn" text="Stock Status" prefWidth="110"/>
+                <TableColumn fx:id="lastUpdatedColumn" text="Last Updated" prefWidth="110"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <right>
+        <VBox spacing="8" prefWidth="300">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+
+            <Label text="Stock Adjustment" style="-fx-font-weight: bold;"/>
+            <Label text="Selected Product:"/>
+            <Label fx:id="selectedProductLabel" style="-fx-font-weight: bold;"/>
+            <Label text="Current Stock:"/>
+            <Label fx:id="currentStockLabel"/>
+
+            <Label text="Adjustment Type:"/>
+            <ComboBox fx:id="adjustmentTypeDropdown" maxWidth="Infinity"/>
+
+            <Label text="Adjustment Quantity:"/>
+            <TextField fx:id="adjustmentQuantityField"/>
+
+            <Label text="Reason:"/>
+            <TextField fx:id="reasonField"/>
+
+            <Label text="Remarks:"/>
+            <TextArea fx:id="remarksField" prefRowCount="2"/>
+
+            <HBox spacing="10">
+                <Button fx:id="adjustStockButton" text="Adjust Stock" onAction="#handleAdjustStock"/>
+                <Button fx:id="clearButton" text="Clear" onAction="#handleClear"/>
+            </HBox>
+
+            <Separator/>
+
+            <HBox spacing="10">
+                <Button fx:id="viewHistoryButton" text="View History" onAction="#handleViewHistory"/>
+                <Button fx:id="exportButton" text="Export" onAction="#handleExport"/>
+            </HBox>
+
+            <Label text="Stock Movement History" style="-fx-font-weight: bold;"/>
+            <TableView fx:id="movementTable" prefHeight="280">
+                <columns>
+                    <TableColumn fx:id="movementDateColumn" text="Date" prefWidth="90"/>
+                    <TableColumn fx:id="movementProductColumn" text="Product" prefWidth="110"/>
+                    <TableColumn fx:id="movementTypeColumn" text="Type" prefWidth="90"/>
+                    <TableColumn fx:id="movementQuantityColumn" text="Qty" prefWidth="50"/>
+                    <TableColumn fx:id="movementPreviousColumn" text="Prev" prefWidth="55"/>
+                    <TableColumn fx:id="movementCurrentColumn" text="Curr" prefWidth="55"/>
+                    <TableColumn fx:id="movementReferenceColumn" text="Reference" prefWidth="90"/>
+                    <TableColumn fx:id="movementPerformedByColumn" text="By" prefWidth="80"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </right>
+
+</BorderPane>

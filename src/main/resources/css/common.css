@@ -1,0 +1,58 @@
+/* ─── SmartMart POS – Common Styles ──────────────────────────────────────── */
+
+.root { -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif; -fx-font-size: 13px; }
+
+/* Page header */
+.page-header {
+    -fx-background-color: #1a1f2e;
+    -fx-padding: 12 20;
+    -fx-min-height: 56;
+}
+.page-title   { -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff; }
+
+/* Labels */
+.field-label     { -fx-text-fill: #374151; -fx-font-weight: bold; -fx-font-size: 12px; }
+.label-muted     { -fx-text-fill: #64748b; -fx-font-size: 12px; }
+.section-title   { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e293b; }
+.summary-value-lg { -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a; }
+
+/* Panels */
+.side-panel {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 14;
+}
+.summary-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 12;
+}
+.history-panel {
+    -fx-background-color: #f0f9ff;
+    -fx-border-color: #bae6fd;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+}
+
+/* Table */
+.table-row-cell:selected { -fx-background-color: #dbeafe; }
+
+/* Buttons */
+.btn-primary        { -fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14; }
+.btn-success        { -fx-background-color: #16a34a; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14; }
+.btn-danger         { -fx-background-color: #dc2626; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14; }
+.btn-secondary      { -fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14; }
+.btn-success-outline { -fx-background-color: transparent; -fx-border-color: #16a34a; -fx-text-fill: #16a34a; -fx-border-radius: 6; -fx-padding: 6 12; }
+.btn-danger-outline  { -fx-background-color: transparent; -fx-border-color: #dc2626; -fx-text-fill: #dc2626; -fx-border-radius: 6; -fx-padding: 6 12; }
+.btn-sm             { -fx-background-color: #e2e8f0; -fx-text-fill: #374151; -fx-background-radius: 4; -fx-padding: 5 12; }
+
+.btn-primary:hover   { -fx-background-color: #1d4ed8; }
+.btn-success:hover   { -fx-background-color: #15803d; }
+.btn-danger:hover    { -fx-background-color: #b91c1c; }
+.btn-secondary:hover { -fx-background-color: #475569; }
+.button:disabled     { -fx-opacity: 0.45; }

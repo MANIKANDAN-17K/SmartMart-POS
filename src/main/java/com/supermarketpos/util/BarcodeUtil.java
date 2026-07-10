@@ -15,6 +15,17 @@ public class BarcodeUtil {
      * Generates a unique-ish barcode: timestamp (ms, base36) + 3 random digits.
      * Uniqueness must still be enforced at DB/service level.
      */
+    public static String normalize(String raw) {
+        if (raw == null) return "";
+        return raw.trim();
+    }
+
+    /** Basic EAN-13 / UPC-A length check (not a full checksum). */
+    public static boolean looksValid(String barcode) {
+        if (barcode == null) return false;
+        String s = barcode.trim();
+        return s.matches("\\d{8,14}") || s.length() >= 3;
+    }
     public static String generateBarcode() {
         long timestampPart = Instant.now().toEpochMilli();
         int randomPart = ThreadLocalRandom.current().nextInt(100, 999);

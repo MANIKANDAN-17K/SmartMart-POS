@@ -29,7 +29,32 @@ public final class AlertUtil {
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.YES;
     }
+    public static void showInfo(String title, String message) {
+        show(Alert.AlertType.INFORMATION, title, message);
+    }
 
+    public static void showWarning(String title, String message) {
+        show(Alert.AlertType.WARNING, title, message);
+    }
+
+    public static void showError(String title, String message) {
+        show(AlertType.ERROR, title, message);
+    }
+
+    public static boolean confirm(String title, String message) {
+        Alert alert = new Alert(AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.YES;
+    }
+
+    private static void show(AlertType type, String title, String message) {
+        Alert alert = new Alert(type, message, ButtonType.OK);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.showAndWait();
+    }
     private static void show(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
