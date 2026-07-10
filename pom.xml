@@ -47,7 +47,11 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.version}</version>
         </dependency>
-
+          <dependency>
+              <groupId>org.mindrot</groupId>
+              <artifactId>jbcrypt</artifactId>
+              <version>0.4</version>
+          </dependency>
         <!-- Flyway -->
         <dependency>
             <groupId>org.flywaydb</groupId>
