@@ -26,7 +26,7 @@ public class SettingsService {
         return settingsDao.findSettings().orElseGet(() -> {
             StoreSettings defaults = new StoreSettings();
             defaults.setStoreName("SmartMart POS");
-            defaults.setCurrencySymbol("$");
+            defaults.setCurrencySymbol("₹");
             defaults.setTaxRate(0.0);
             defaults.setTheme("light");
             defaults.setAppVersion("1.0.0");

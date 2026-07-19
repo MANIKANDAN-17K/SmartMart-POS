@@ -1,50 +1,69 @@
 package com.supermarketpos.util;
 
-import javafx.concurrent.Task;
-
-import javax.print.PrintException;
-import java.awt.*;
-import java.awt.print.PrinterException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Utility for sending HTML content to the default system printer.
- * Uses a temporary file + Desktop.open() as the most reliable
- * cross-platform approach for JavaFX desktop apps without a browser engine.
- *
- * For thermal receipt printers, replace the body of printHtml() with
- * an ESC/POS byte-stream implementation.
+ * Utility for saving HTML receipts/reports to local files.
+ * For development, files are saved to a receipts/ directory.
+ * Later, this can be swapped for actual printer integration.
  */
 public class PrintUtil {
 
     private static final Logger log = Logger.getLogger(PrintUtil.class.getName());
+    private static final String RECEIPTS_DIR = "receipts";
+    private static final DateTimeFormatter FILE_DATE_FMT =
+            DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     private PrintUtil() {}
 
     /**
-     * Writes HTML to a temp file and opens it in the system's default
-     * browser/viewer which handles printing. Blocks until the process starts.
+     * Saves HTML content to a file in the receipts/ directory.
+     * Returns the absolute path of the saved file.
+     *
+     * @param html    the HTML content to save
+     * @param jobName a descriptive name for the receipt (used in the filename)
+     * @return the absolute path of the saved file
      */
-    public static void printHtml(String html, String jobName) {
+    public static String printHtml(String html, String jobName) {
         try {
-            Path tmp = Files.createTempFile("smartmart_receipt_", ".html");
-            Files.writeString(tmp, html, StandardCharsets.UTF_8);
-            tmp.toFile().deleteOnExit();
-
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(tmp.toFile());
-                log.info("Receipt opened for printing: " + jobName);
-            } else {
-                throw new UnsupportedOperationException("Desktop API not supported on this platform.");
+            Path receiptsDir = Paths.get(RECEIPTS_DIR);
+            if (!Files.exists(receiptsDir)) {
+                Files.createDirectories(receiptsDir);
             }
+
+            String sanitizedName = jobName.replaceAll("[^a-zA-Z0-9_-]", "_");
+            String timestamp = LocalDateTime.now().format(FILE_DATE_FMT);
+            String fileName = sanitizedName + "_" + timestamp + ".html";
+
+            Path filePath = receiptsDir.resolve(fileName);
+            Files.writeString(filePath, html, StandardCharsets.UTF_8);
+
+            String absolutePath = filePath.toAbsolutePath().toString();
+            log.info("Receipt saved to file: " + absolutePath);
+            return absolutePath;
         } catch (IOException ex) {
-            log.log(Level.SEVERE, "Failed to create receipt temp file.", ex);
-            throw new RuntimeException("Printer unavailable.", ex);
+            log.log(Level.SEVERE, "Failed to save receipt file.", ex);
+            throw new RuntimeException("Could not save receipt file.", ex);
         }
+    }
+
+    /**
+     * Saves HTML report content to a file in the receipts/ directory.
+     * Returns the absolute path of the saved file.
+     *
+     * @param html       the HTML content to save
+     * @param reportName a descriptive name for the report
+     * @return the absolute path of the saved file
+     */
+    public static String saveReport(String html, String reportName) {
+        return printHtml(html, "Report_" + reportName);
     }
 }

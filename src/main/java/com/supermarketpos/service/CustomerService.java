@@ -45,6 +45,7 @@ public class CustomerService {
         customer.setEmail(email.isEmpty() ? null : email);
         customer.setAddress(address.isEmpty() ? null : address);
         customer.setStatus(Status.ACTIVE);
+        customer.setCreatedAt(java.time.LocalDateTime.now());
 
         customerDao.insert(conn, customer);
         log.info("Customer created: " + customer.getPhone());

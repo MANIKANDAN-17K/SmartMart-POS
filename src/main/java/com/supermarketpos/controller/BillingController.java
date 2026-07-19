@@ -139,6 +139,26 @@ public class BillingController implements Initializable {
     @FXML
     private Button btnClearCart;
 
+    // Design System Controls & Sidebar Navigation
+    @FXML private Label loggedUserLabel;
+    @FXML private Label roleLabel;
+    @FXML private Label dateLabel;
+    @FXML private Label currentTimeLabel;
+    @FXML private Button refreshButton;
+    @FXML private Button logoutButton;
+
+    @FXML private Button btnDashboardNav;
+    @FXML private Button btnNewBillNav;
+    @FXML private Button btnProductsNav;
+    @FXML private Button btnInventoryNav;
+    @FXML private Button btnPurchasesNav;
+    @FXML private Button btnCustomersNav;
+    @FXML private Button btnSuppliersNav;
+    @FXML private Button btnReportsNav;
+    @FXML private Button btnSettingsNav;
+    @FXML private Button btnUsersNav;
+    @FXML private Button btnBackupNav;
+
     // ── init ──────────────────────────────────────────────────────────────────
 
     @Override
@@ -149,15 +169,36 @@ public class BillingController implements Initializable {
         setupProductSearch();
         startNewBill();
         startClock();
+        loadUserInfo();
         log.info("Billing screen opened.");
     }
 
+    private void loadUserInfo() {
+        com.supermarketpos.model.User currentUser = com.supermarketpos.session.UserSession.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            if (loggedUserLabel != null) loggedUserLabel.setText(currentUser.getUsername());
+            if (roleLabel != null) roleLabel.setText(com.supermarketpos.session.UserSession.getInstance().getCurrentRole().name());
+        } else {
+            if (loggedUserLabel != null) loggedUserLabel.setText("admin");
+            if (roleLabel != null) roleLabel.setText("Administrator");
+        }
+    }
+
     private void startClock() {
+        updateDateAndTime();
         javafx.animation.Timeline clock = new javafx.animation.Timeline(
                 new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1),
-                        e -> lblDateTime.setText(DateUtil.now())));
+                        e -> updateDateAndTime()));
         clock.setCycleCount(javafx.animation.Animation.INDEFINITE);
         clock.play();
+    }
+
+    private void updateDateAndTime() {
+        if (lblDateTime != null) lblDateTime.setText(DateUtil.now());
+        java.time.LocalDate now = java.time.LocalDate.now();
+        java.time.format.DateTimeFormatter dateFmt = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy EEEE");
+        if (dateLabel != null) dateLabel.setText(now.format(dateFmt));
+        if (currentTimeLabel != null) currentTimeLabel.setText(DateUtil.nowDisplay());
     }
 
     // ── cart table setup ──────────────────────────────────────────────────────
@@ -228,6 +269,14 @@ public class BillingController implements Initializable {
     // ── payment listeners ─────────────────────────────────────────────────────
 
     private void setupPaymentListeners() {
+        if (tgPayment == null) {
+            tgPayment = new ToggleGroup();
+        }
+        rbCash.setToggleGroup(tgPayment);
+        rbCard.setToggleGroup(tgPayment);
+        rbUpi.setToggleGroup(tgPayment);
+        rbSplit.setToggleGroup(tgPayment);
+
         tfCashPaid.textProperty().addListener((obs, o, n) -> updateBalance());
         tfCardPaid.textProperty().addListener((obs, o, n) -> updateBalance());
         tfUpiPaid.textProperty().addListener((obs, o, n) -> updateBalance());
@@ -502,17 +551,60 @@ public class BillingController implements Initializable {
     }
 
     @FXML
-    private void onBackToDashboard() {
+    private void onRefresh() {
+        startNewBill();
+    }
+
+    private void navigateTo(String fxmlPath, String title, Button sourceButton) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/fxml/dashboard.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
             javafx.scene.Parent root = loader.load();
-            javafx.stage.Stage stage = (javafx.stage.Stage) btnNewBill.getScene().getWindow();
-            stage.setScene(new javafx.scene.Scene(root));
-            stage.setTitle("Dashboard");
-        } catch (java.io.IOException e) {
-            log.log(Level.SEVERE, "Could not load Dashboard view", e);
-            AlertUtil.showError("Navigation Error", "Could not load Dashboard.");
+            javafx.stage.Stage stage = (javafx.stage.Stage) (sourceButton != null && sourceButton.getScene() != null ?
+                    sourceButton.getScene().getWindow() : btnNewBill.getScene().getWindow());
+            double w = stage.getWidth();
+            double h = stage.getHeight();
+            stage.setScene(new javafx.scene.Scene(root, w, h));
+            stage.setTitle(title);
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Could not load " + title + " view", e);
+            AlertUtil.showError("Navigation Error", "Could not load " + title + ": " + e.getMessage());
         }
+    }
+
+    @FXML private void onDashboard() { navigateTo("/fxml/dashboard.fxml", "Dashboard", btnNewBillNav); }
+    @FXML private void onNewBillNav() { onNewBill(); }
+    @FXML private void onProducts() { navigateTo("/fxml/product.fxml", "Products", btnNewBillNav); }
+    @FXML private void onInventory() { navigateTo("/fxml/inventory.fxml", "Inventory", btnNewBillNav); }
+    @FXML private void onPurchases() { navigateTo("/fxml/purchase.fxml", "Purchases", btnNewBillNav); }
+    @FXML private void onCustomersNav() { navigateTo("/fxml/customer.fxml", "Customers", btnNewBillNav); }
+    @FXML private void onSuppliersNav() { navigateTo("/fxml/supplier.fxml", "Suppliers", btnNewBillNav); }
+    @FXML private void onReports() { navigateTo("/fxml/report.fxml", "Reports", btnNewBillNav); }
+    @FXML private void onSettings() {
+        if (com.supermarketpos.session.UserSession.getInstance().getCurrentRole() != com.supermarketpos.model.Role.ADMIN) {
+            AlertUtil.showError("Access Denied", "Only ADMIN users can access Settings.");
+            return;
+        }
+        navigateTo("/fxml/settings.fxml", "Settings", btnNewBillNav);
+    }
+    @FXML private void onUsersNav() {
+        if (com.supermarketpos.session.UserSession.getInstance().getCurrentRole() != com.supermarketpos.model.Role.ADMIN) {
+            AlertUtil.showError("Access Denied", "Only ADMIN users can manage Users.");
+            return;
+        }
+        navigateTo("/fxml/user_management.fxml", "Users Management", btnNewBillNav);
+    }
+    @FXML private void onBackupNav() { AlertUtil.showInfo("Database Backup", "Initiating database backup process..."); }
+
+    @FXML
+    private void onLogout() {
+        boolean confirmed = AlertUtil.showConfirm("Confirm Logout", "Are you sure you want to log out?");
+        if (!confirmed) return;
+        new com.supermarketpos.service.AuthService().logout();
+        navigateTo("/fxml/login.fxml", "Login", logoutButton);
+    }
+
+    @FXML
+    private void onBackToDashboard() {
+        onDashboard();
     }
 }

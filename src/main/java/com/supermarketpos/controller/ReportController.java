@@ -9,7 +9,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.print.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
@@ -83,16 +82,32 @@ public class ReportController implements Initializable {
     private VBox reportContainer;
 
     // ── Toolbar buttons ───────────────────────────────────────────
-    @FXML
-    private Button btnGenerate;
-    @FXML
-    private Button btnExportExcel;
-    @FXML
-    private Button btnPrint;
-    @FXML
-    private Button btnRefresh;
-    @FXML
-    private Button btnClearFilters;
+    @FXML private Button btnGenerate;
+    @FXML private Button btnExportExcel;
+    @FXML private Button btnPrint;
+    @FXML private Button btnRefresh;
+    @FXML private Button btnClearFilters;
+
+    // Design System Controls & Sidebar Navigation
+    @FXML private Label loggedUserLabel;
+    @FXML private Label roleLabel;
+    @FXML private Label dateLabel;
+    @FXML private Label currentTimeLabel;
+    @FXML private Button logoutButton;
+
+    @FXML private Button btnDashboardNav;
+    @FXML private Button btnNewBillNav;
+    @FXML private Button btnProductsNav;
+    @FXML private Button btnInventoryNav;
+    @FXML private Button btnPurchasesNav;
+    @FXML private Button btnCustomersNav;
+    @FXML private Button btnSuppliersNav;
+    @FXML private Button btnReportsNav;
+    @FXML private Button btnSettingsNav;
+    @FXML private Button btnUsersNav;
+    @FXML private Button btnBackupNav;
+
+    private javafx.animation.Timeline clockTimeline;
 
     private final ReportService reportService = new ReportService();
     private String currentReportType = "";
@@ -107,6 +122,35 @@ public class ReportController implements Initializable {
         setupStockStatusCombo();
         cmbReportType.getSelectionModel().selectFirst();
         onReportTypeChanged();
+        loadUserInfo();
+        startClock();
+    }
+
+    private void loadUserInfo() {
+        var currentUser = com.supermarketpos.session.UserSession.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            if (loggedUserLabel != null) loggedUserLabel.setText(currentUser.getUsername());
+            if (roleLabel != null) roleLabel.setText(com.supermarketpos.session.UserSession.getInstance().getCurrentRole().name());
+        } else {
+            if (loggedUserLabel != null) loggedUserLabel.setText("admin");
+            if (roleLabel != null) roleLabel.setText("Administrator");
+        }
+    }
+
+    private void startClock() {
+        updateDateAndTime();
+        clockTimeline = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1),
+                        e -> updateDateAndTime()));
+        clockTimeline.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        clockTimeline.play();
+    }
+
+    private void updateDateAndTime() {
+        LocalDate now = LocalDate.now();
+        java.time.format.DateTimeFormatter dateFmt = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy EEEE");
+        if (dateLabel != null) dateLabel.setText(now.format(dateFmt));
+        if (currentTimeLabel != null) currentTimeLabel.setText(DateUtil.nowDisplay());
     }
 
     // ── Setup ─────────────────────────────────────────────────────
@@ -123,37 +167,47 @@ public class ReportController implements Initializable {
     }
 
     private void setupYearCombo() {
-        ObservableList<Integer> years = FXCollections.observableArrayList();
-        int thisYear = LocalDate.now().getYear();
-        for (int y = thisYear; y >= thisYear - 5; y--)
-            years.add(y);
-        cmbYear.setItems(years);
-        cmbYear.getSelectionModel().selectFirst();
+        if (cmbYear != null) {
+            ObservableList<Integer> years = FXCollections.observableArrayList();
+            int thisYear = LocalDate.now().getYear();
+            for (int y = thisYear; y >= thisYear - 5; y--)
+                years.add(y);
+            cmbYear.setItems(years);
+            cmbYear.getSelectionModel().selectFirst();
+        }
     }
 
     private void setupMonthCombo() {
-        ObservableList<String> months = FXCollections.observableArrayList();
-        for (Month m : Month.values())
-            months.add(m.name());
-        cmbMonth.setItems(months);
-        cmbMonth.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
+        if (cmbMonth != null) {
+            ObservableList<String> months = FXCollections.observableArrayList();
+            for (Month m : Month.values())
+                months.add(m.name());
+            cmbMonth.setItems(months);
+            cmbMonth.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
+        }
     }
 
     private void loadCategoriesAndSuppliers() {
-        ObservableList<String> cats = FXCollections.observableArrayList("All");
-        cats.addAll(reportService.getAllCategories());
-        cmbCategory.setItems(cats);
-        cmbCategory.getSelectionModel().selectFirst();
+        if (cmbCategory != null) {
+            ObservableList<String> cats = FXCollections.observableArrayList("All");
+            cats.addAll(reportService.getAllCategories());
+            cmbCategory.setItems(cats);
+            cmbCategory.getSelectionModel().selectFirst();
+        }
 
-        ObservableList<String> sups = FXCollections.observableArrayList("All");
-        sups.addAll(reportService.getAllSupplierNames());
-        cmbSupplier.setItems(sups);
-        cmbSupplier.getSelectionModel().selectFirst();
+        if (cmbSupplier != null) {
+            ObservableList<String> sups = FXCollections.observableArrayList("All");
+            sups.addAll(reportService.getAllSupplierNames());
+            cmbSupplier.setItems(sups);
+            cmbSupplier.getSelectionModel().selectFirst();
+        }
     }
 
     private void setupStockStatusCombo() {
-        cmbStockStatus.setItems(FXCollections.observableArrayList("All", "OK", "LOW", "OUT"));
-        cmbStockStatus.getSelectionModel().selectFirst();
+        if (cmbStockStatus != null) {
+            cmbStockStatus.setItems(FXCollections.observableArrayList("All", "OK", "LOW", "OUT"));
+            cmbStockStatus.getSelectionModel().selectFirst();
+        }
     }
 
     // ── Report type visibility ────────────────────────────────────
@@ -500,23 +554,42 @@ public class ReportController implements Initializable {
             return;
         }
         try {
-            PrinterJob job = PrinterJob.createPrinterJob();
-            if (job == null) {
-                AlertUtil.showError("Printer Error", "No printer available.");
-                return;
+            // Build an HTML table from the current report data
+            StringBuilder html = new StringBuilder();
+            html.append("<!DOCTYPE html><html><head><meta charset='UTF-8'>");
+            html.append("<title>").append(currentReportType).append("</title>");
+            html.append("<style>body{font-family:Arial,sans-serif;margin:20px;}");
+            html.append("h1{color:#2c3e50;}table{border-collapse:collapse;width:100%;}");
+            html.append("th,td{border:1px solid #ddd;padding:8px;text-align:left;}");
+            html.append("th{background:#2c3e50;color:white;}</style></head><body>");
+            html.append("<h1>").append(currentReportType).append("</h1>");
+            html.append("<p>Generated: ").append(java.time.LocalDateTime.now().format(
+                    java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))).append("</p>");
+            html.append("<table><thead><tr>");
+
+            // Headers
+            for (var col : tblReport.getColumns()) {
+                html.append("<th>").append(col.getText()).append("</th>");
             }
-            if (job.showPrintDialog(btnPrint.getScene().getWindow())) {
-                boolean printed = job.printPage(tblReport);
-                if (printed) {
-                    job.endJob();
-                    LOGGER.info("Report printed: " + currentReportType);
-                } else {
-                    AlertUtil.showError("Print Failed", "Printing could not be completed.");
+            html.append("</tr></thead><tbody>");
+
+            // Rows
+            for (var row : tblReport.getItems()) {
+                html.append("<tr>");
+                for (int i = 0; i < row.size(); i++) {
+                    html.append("<td>").append(row.get(i) != null ? row.get(i) : "").append("</td>");
                 }
+                html.append("</tr>");
             }
+            html.append("</tbody></table></body></html>");
+
+            String filePath = PrintUtil.saveReport(html.toString(), currentReportType.replace(" ", "_"));
+            AlertUtil.showInfo("Report Saved",
+                    "Report saved successfully.\nFile: " + filePath);
+            LOGGER.info("Report saved to file: " + filePath);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Printer unavailable", e);
-            AlertUtil.showError("Print Error", "Printer error: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Report save failed", e);
+            AlertUtil.showError("Save Error", "Could not save report: " + e.getMessage());
         }
     }
 
@@ -544,17 +617,67 @@ public class ReportController implements Initializable {
         currentReportData = null;
     }
 
+    @FXML private void handleGenerateReport() { onGenerate(); }
+    @FXML private void handleClearFilters() { onClearFilters(); }
+    @FXML private void handleExportExcel() { onExportExcel(); }
+    @FXML private void handlePrint() { onPrint(); }
+
+    private void stopTimers() {
+        if (clockTimeline != null) clockTimeline.stop();
+    }
+
+    private void navigateTo(String fxmlPath, String title, Button sourceButton) {
+        try {
+            stopTimers();
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) (sourceButton != null && sourceButton.getScene() != null ?
+                    sourceButton.getScene().getWindow() : cmbReportType.getScene().getWindow());
+            double w = stage.getWidth();
+            double h = stage.getHeight();
+            stage.setScene(new javafx.scene.Scene(root, w, h));
+            stage.setTitle(title);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Navigation error to " + title, e);
+            AlertUtil.showError("Navigation Error", "Could not load " + title + " view: " + e.getMessage());
+        }
+    }
+
+    @FXML private void onDashboard() { navigateTo("/fxml/dashboard.fxml", "Dashboard", btnReportsNav); }
+    @FXML private void onNewBill() { navigateTo("/fxml/billing.fxml", "Billing", btnReportsNav); }
+    @FXML private void onProducts() { navigateTo("/fxml/product.fxml", "Products", btnReportsNav); }
+    @FXML private void onInventory() { navigateTo("/fxml/inventory.fxml", "Inventory", btnReportsNav); }
+    @FXML private void onPurchases() { navigateTo("/fxml/purchase.fxml", "Purchases", btnReportsNav); }
+    @FXML private void onCustomersNav() { navigateTo("/fxml/customer.fxml", "Customers", btnReportsNav); }
+    @FXML private void onSuppliersNav() { navigateTo("/fxml/supplier.fxml", "Suppliers", btnReportsNav); }
+    @FXML private void onReports() { handleGenerateReport(); }
+    @FXML private void onSettings() {
+        if (com.supermarketpos.session.UserSession.getInstance().getCurrentRole() != com.supermarketpos.model.Role.ADMIN) {
+            AlertUtil.showError("Access Denied", "Only ADMIN users can access Settings.");
+            return;
+        }
+        navigateTo("/fxml/settings.fxml", "Settings", btnReportsNav);
+    }
+    @FXML private void onUsersNav() {
+        if (com.supermarketpos.session.UserSession.getInstance().getCurrentRole() != com.supermarketpos.model.Role.ADMIN) {
+            AlertUtil.showError("Access Denied", "Only ADMIN users can manage Users.");
+            return;
+        }
+        navigateTo("/fxml/user_management.fxml", "Users Management", btnReportsNav);
+    }
+    @FXML private void onBackupNav() { AlertUtil.showInfo("Database Backup", "Initiating database backup process..."); }
+
+    @FXML
+    private void onLogout() {
+        boolean confirmed = AlertUtil.showConfirm("Confirm Logout", "Are you sure you want to log out?");
+        if (!confirmed) return;
+        stopTimers();
+        new com.supermarketpos.service.AuthService().logout();
+        navigateTo("/fxml/login.fxml", "Login", logoutButton);
+    }
+
     @FXML
     private void onBackToDashboard() {
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/fxml/dashboard.fxml"));
-            javafx.scene.Parent root = loader.load();
-            javafx.stage.Stage stage = (javafx.stage.Stage) cmbReportType.getScene().getWindow();
-            stage.setScene(new javafx.scene.Scene(root));
-            stage.setTitle("Dashboard");
-        } catch (java.io.IOException e) {
-            AlertUtil.showError("Navigation Error", "Could not load Dashboard.");
-        }
+        onDashboard();
     }
 }

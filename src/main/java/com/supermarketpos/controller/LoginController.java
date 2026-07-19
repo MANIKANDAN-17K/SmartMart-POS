@@ -7,11 +7,17 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class LoginController {
+
+    private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -19,6 +25,7 @@ public class LoginController {
     @FXML private CheckBox showPasswordCheckBox;
     @FXML private Button loginButton;
     @FXML private Button exitButton;
+    @FXML private Hyperlink forgotPasswordLink;
 
     private final AuthService authService = new AuthService();
 
@@ -42,6 +49,9 @@ public class LoginController {
     private void onLogin(ActionEvent event) {
         String username = usernameField.getText() != null ? usernameField.getText().trim() : "";
         String password = passwordField.getText();
+        if (password == null || password.isEmpty()) {
+            password = visiblePasswordField.getText();
+        }
 
         AuthService.AuthResult result = authService.login(username, password);
         if (!result.isSuccess()) {
@@ -49,8 +59,6 @@ public class LoginController {
             return;
         }
 
-        AlertUtil.showInfo("Welcome", "Logged in as " + result.getUser().getUsername()
-                + " (" + result.getUser().getRole() + ")");
         openNextScreenForRole(result.getUser().getRole());
     }
 
@@ -58,6 +66,41 @@ public class LoginController {
     private void onExit(ActionEvent event) {
         Stage stage = (Stage) exitButton.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void onForgotPassword(ActionEvent event) {
+        String currentUsername = usernameField.getText() != null ? usernameField.getText().trim() : "";
+        javafx.scene.control.TextInputDialog userDialog = new javafx.scene.control.TextInputDialog(currentUsername);
+        userDialog.setTitle("Forgot Password");
+        userDialog.setHeaderText("Account Verification");
+        userDialog.setContentText("Enter your username:");
+
+        java.util.Optional<String> userResult = userDialog.showAndWait();
+        if (userResult.isEmpty() || userResult.get().isBlank()) {
+            return;
+        }
+
+        String username = userResult.get().trim();
+        javafx.scene.control.TextInputDialog passDialog = new javafx.scene.control.TextInputDialog();
+        passDialog.setTitle("Reset Password");
+        passDialog.setHeaderText("Set new password for user: " + username);
+        passDialog.setContentText("Enter your new password:");
+
+        java.util.Optional<String> passResult = passDialog.showAndWait();
+        if (passResult.isEmpty() || passResult.get().isBlank()) {
+            return;
+        }
+
+        String newPassword = passResult.get().trim();
+        AuthService.AuthResult result = authService.resetPassword(username, newPassword);
+        if (result.isSuccess()) {
+            AlertUtil.showInfo("Success", "Password for user '" + username + "' has been reset successfully.");
+            usernameField.setText(username);
+            passwordField.setText(newPassword);
+        } else {
+            AlertUtil.showError("Reset Failed", result.getMessage());
+        }
     }
 
     /**
@@ -71,10 +114,13 @@ public class LoginController {
                     getClass().getResource("/fxml/dashboard.fxml"));
             javafx.scene.Parent dashboardRoot = loader.load();
             Stage stage = (Stage) loginButton.getScene().getWindow();
-            stage.setScene(new javafx.scene.Scene(dashboardRoot));
+            double w = stage.getWidth();
+            double h = stage.getHeight();
+            stage.setScene(new javafx.scene.Scene(dashboardRoot, w, h));
             stage.setTitle("Dashboard");
-        } catch (java.io.IOException e) {
-            AlertUtil.showError("Navigation Error", "Could not load the dashboard.");
+        } catch (Exception e) {
+            LOGGER.error("Navigation error to dashboard", e);
+            AlertUtil.showError("Navigation Error", "Could not load Dashboard: " + e.getMessage());
         }
     }
 }

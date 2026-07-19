@@ -1,93 +1,204 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.supermarketpos.controller.ReportController"
-            stylesheets="@../css/common.css"
-            prefWidth="1100" prefHeight="750">
+            stylesheets="@../css/dashboard.css"
+            prefWidth="1280" prefHeight="800">
 
-    <top>
-        <VBox styleClass="top-bar" spacing="8">
-            <padding><Insets topRightBottomLeft="12"/></padding>
-            <HBox spacing="20" alignment="CENTER_LEFT">
-                <Label text="Reports &amp; Analytics" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Dashboard" onAction="#onBackToDashboard" styleClass="btn-secondary"/>
+    <!-- ── LEFT SIDEBAR ────────────────────────────────────────────────── -->
+    <left>
+        <VBox styleClass="sidebar">
+            <HBox styleClass="logo-container">
+                <Label text="🛒" styleClass="logo-icon"/>
+                <Label text="SmartMart" styleClass="logo-text-brand"/>
+                <Label text="POS" styleClass="logo-text-pos"/>
             </HBox>
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Report Type:"/>
-                <ComboBox fx:id="cmbReportType" prefWidth="220"/>
-            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="sidebar-scroll">
+                <VBox spacing="4.0">
+                    <padding><Insets top="10.0" right="12.0" bottom="10.0" left="12.0"/></padding>
+
+                    <Button fx:id="btnDashboardNav" text="🏠  Dashboard" onAction="#onDashboard" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnNewBillNav" text="🛒  New Bill" onAction="#onNewBill" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnProductsNav" text="🏷️  Products" onAction="#onProducts" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnInventoryNav" text="📦  Inventory" onAction="#onInventory" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnPurchasesNav" text="🛍️  Purchases" onAction="#onPurchases" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnCustomersNav" text="👥  Customers" onAction="#onCustomersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnSuppliersNav" text="🚚  Suppliers" onAction="#onSuppliersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnReportsNav" text="📊  Reports" onAction="#onReports" styleClass="sidebar-nav-button, active" maxWidth="Infinity"/>
+                    <Button fx:id="btnSettingsNav" text="⚙️  Settings" onAction="#onSettings" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnUsersNav" text="👤  Users" onAction="#onUsersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnBackupNav" text="💾  Backup" onAction="#onBackupNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                </VBox>
+            </ScrollPane>
+
+            <VBox>
+                <padding><Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/></padding>
+                <HBox styleClass="sidebar-user-card" alignment="CENTER_LEFT">
+                    <Label text="👤" styleClass="avatar-circle"/>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label fx:id="loggedUserLabel" text="admin" styleClass="user-name-text"/>
+                        <Label fx:id="roleLabel" text="Administrator" styleClass="user-role-text"/>
+                        <Label text="🟢 Online" styleClass="status-online"/>
+                    </VBox>
+                    <Button fx:id="logoutButton" text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
+                </HBox>
+            </VBox>
         </VBox>
+    </left>
+
+    <!-- ── TOP HEADER BAR ──────────────────────────────────────────────── -->
+    <top>
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="15.0">
+            <Button text="🛒" styleClass="menu-toggle-btn"/>
+
+            <HBox styleClass="search-box">
+                <Label text="📊 " style="-fx-text-fill: #94a3b8;"/>
+                <Label text="Sales Analytics &amp; Reports Center" style="-fx-font-weight: bold; -fx-text-fill: #334155; -fx-font-size: 13px;"/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label fx:id="dateLabel" text="19 Jul 2026 Sunday" styleClass="header-info-label"/>
+            <Label text="|" styleClass="header-info-label" style="-fx-text-fill: #cbd5e1;"/>
+            <Label fx:id="currentTimeLabel" text="01:39 PM" styleClass="header-info-label"/>
+            <Button fx:id="btnRefresh" text="🔄" onAction="#handleGenerateReport" styleClass="menu-toggle-btn"/>
+            <Button text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
+        </HBox>
     </top>
 
-    <!-- CENTER: Filters + Cards + Table -->
+    <!-- ── CENTER CONTENT ─────────────────────────────────────────────── -->
     <center>
-        <VBox spacing="10">
-            <padding><Insets top="10" right="14" bottom="10" left="14"/></padding>
+        <ScrollPane fitToWidth="true" styleClass="sidebar-scroll">
+            <VBox styleClass="dashboard-content">
 
-            <!-- Filter Panel -->
-            <HBox fx:id="filterPanel" spacing="12" alignment="CENTER_LEFT" styleClass="filter-panel">
-                <padding><Insets topRightBottomLeft="8"/></padding>
-                <DatePicker fx:id="dpSingleDate" promptText="Select Date"/>
-                <DatePicker fx:id="dpStartDate" promptText="Start Date"/>
-                <DatePicker fx:id="dpEndDate" promptText="End Date"/>
-                <ComboBox fx:id="cmbMonth" promptText="Month" prefWidth="120"/>
-                <ComboBox fx:id="cmbYear" promptText="Year" prefWidth="90"/>
-                <ComboBox fx:id="cmbCategory" promptText="Category" prefWidth="130"/>
-                <ComboBox fx:id="cmbSupplier" promptText="Supplier" prefWidth="150"/>
-                <ComboBox fx:id="cmbStockStatus" promptText="Stock Status" prefWidth="130"/>
-                <TextField fx:id="txtProductSearch" promptText="Search Product..." prefWidth="150"/>
-            </HBox>
+                <!-- Header Title -->
+                <VBox spacing="4.0">
+                    <Label text="Reports &amp; Sales Analytics" styleClass="welcome-title"/>
+                    <Label text="Generate comprehensive daily, monthly, inventory, customer, and tax audit reports." styleClass="welcome-subtitle"/>
+                </VBox>
 
-            <!-- Summary Cards -->
-            <HBox spacing="10">
-                <VBox styleClass="summary-card" fx:id="card1">
-                    <Label fx:id="lblCard1Title" styleClass="card-title"/>
-                    <Label fx:id="lblCard1Value" styleClass="card-value"/>
-                </VBox>
-                <VBox styleClass="summary-card" fx:id="card2">
-                    <Label fx:id="lblCard2Title" styleClass="card-title"/>
-                    <Label fx:id="lblCard2Value" styleClass="card-value"/>
-                </VBox>
-                <VBox styleClass="summary-card" fx:id="card3">
-                    <Label fx:id="lblCard3Title" styleClass="card-title"/>
-                    <Label fx:id="lblCard3Value" styleClass="card-value"/>
-                </VBox>
-                <VBox styleClass="summary-card" fx:id="card4">
-                    <Label fx:id="lblCard4Title" styleClass="card-title"/>
-                    <Label fx:id="lblCard4Value" styleClass="card-value"/>
-                </VBox>
-                <VBox styleClass="summary-card" fx:id="card5">
-                    <Label fx:id="lblCard5Title" styleClass="card-title"/>
-                    <Label fx:id="lblCard5Value" styleClass="card-value"/>
-                </VBox>
-            </HBox>
+                <!-- Filter Controls Card -->
+                <VBox styleClass="content-card">
+                    <HBox spacing="14" alignment="CENTER_LEFT">
+                        <VBox spacing="4" prefWidth="240">
+                            <Label text="Report Module Type *" styleClass="form-label"/>
+                            <ComboBox fx:id="cmbReportType" promptText="Select Report Type" maxWidth="Infinity"/>
+                        </VBox>
 
-            <!-- Search Bar -->
-            <HBox spacing="8" alignment="CENTER_LEFT">
-                <Label text="Search:"/>
-                <TextField fx:id="txtSearch" promptText="Search records..." prefWidth="300"/>
-            </HBox>
+                        <VBox spacing="4">
+                            <Label text="Start Date" styleClass="form-label"/>
+                            <DatePicker fx:id="dpStartDate" prefWidth="135"/>
+                        </VBox>
 
-            <!-- Report Table -->
-            <TableView fx:id="tblReport" VBox.vgrow="ALWAYS" styleClass="report-table"/>
+                        <VBox spacing="4">
+                            <Label text="End Date" styleClass="form-label"/>
+                            <DatePicker fx:id="dpEndDate" prefWidth="135"/>
+                        </VBox>
 
-        </VBox>
+                        <VBox spacing="4">
+                            <Label text="Single Date" styleClass="form-label"/>
+                            <DatePicker fx:id="dpSingleDate" prefWidth="135"/>
+                        </VBox>
+
+                        <VBox spacing="4">
+                            <Label text="Month" styleClass="form-label"/>
+                            <ComboBox fx:id="cmbMonth" prefWidth="110"/>
+                        </VBox>
+
+                        <VBox spacing="4">
+                            <Label text="Year" styleClass="form-label"/>
+                            <ComboBox fx:id="cmbYear" prefWidth="90"/>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS"/>
+
+                        <VBox spacing="4">
+                            <Label text="Actions" styleClass="form-label"/>
+                            <HBox spacing="8">
+                                <Button fx:id="btnGenerate" text="⚡ Generate" onAction="#handleGenerateReport" styleClass="btn-primary"/>
+                                <Button fx:id="btnClearFilters" text="🔄 Reset" onAction="#handleClearFilters" styleClass="btn-secondary"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- KPI Metric Cards Bar -->
+                <HBox spacing="16.0">
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="💰" styleClass="kpi-icon-box, kpi-icon-sales"/>
+                        <VBox spacing="2">
+                            <Label fx:id="lblCard1Title" text="Total Revenue" styleClass="kpi-title"/>
+                            <Label fx:id="lblCard1Value" text="₹ 0.00" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="🧾" styleClass="kpi-icon-box, kpi-icon-products"/>
+                        <VBox spacing="2">
+                            <Label fx:id="lblCard2Title" text="Total Bills" styleClass="kpi-title"/>
+                            <Label fx:id="lblCard2Value" text="0" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="🏷️" styleClass="kpi-icon-box, kpi-icon-customers"/>
+                        <VBox spacing="2">
+                            <Label fx:id="lblCard3Title" text="Items Sold" styleClass="kpi-title"/>
+                            <Label fx:id="lblCard3Value" text="0" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="📊" styleClass="kpi-icon-box, kpi-icon-profit"/>
+                        <VBox spacing="2">
+                            <Label fx:id="lblCard4Title" text="Net Profit / GST" styleClass="kpi-title"/>
+                            <Label fx:id="lblCard4Value" text="₹ 0.00" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+                </HBox>
+
+                <!-- Report Result Table Area -->
+                <VBox styleClass="content-card" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="Generated Report Data" styleClass="card-header-title"/>
+                        <TextField fx:id="txtSearch" promptText="Filter report table..." prefWidth="240"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnExportExcel" text="📊 Export to Excel" onAction="#handleExportExcel" styleClass="btn-secondary"/>
+                        <Button fx:id="btnPrint" text="🖨️ Export PDF" onAction="#handlePrint" styleClass="btn-secondary"/>
+                    </HBox>
+
+                    <VBox fx:id="reportContainer" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="tblReport" prefHeight="420" VBox.vgrow="ALWAYS">
+                            <placeholder><Label text="Select a report type above and click 'Generate' to display analytics."/></placeholder>
+                        </TableView>
+                    </VBox>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
     </center>
 
-    <!-- BOTTOM: Action Toolbar -->
+    <!-- ── FOOTER BAR ──────────────────────────────────────────────────── -->
     <bottom>
-        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="action-toolbar">
-            <padding><Insets topRightBottomLeft="10"/></padding>
-            <Button fx:id="btnClearFilters" text="Clear Filters" onAction="#onClearFilters" styleClass="btn-secondary"/>
-            <Button fx:id="btnRefresh"      text="Refresh"       onAction="#onRefresh"      styleClass="btn-secondary"/>
-            <Button fx:id="btnGenerate"     text="Generate"      onAction="#onGenerate"     styleClass="btn-primary"/>
-            <Button fx:id="btnExportExcel"  text="Export Excel"  onAction="#onExportExcel"  styleClass="btn-success"/>
-            <Button fx:id="btnPrint"        text="Print"         onAction="#onPrint"        styleClass="btn-info"/>
+        <HBox styleClass="footer-bar" alignment="CENTER_LEFT">
+            <Label text="SmartMart POS v1.0.0 — Reports Engine" styleClass="footer-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="© 2026 SmartMart POS. All rights reserved." styleClass="footer-text"/>
         </HBox>
     </bottom>
-
 </BorderPane>

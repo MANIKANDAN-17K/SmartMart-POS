@@ -2,6 +2,7 @@ package com.supermarketpos.service;
 
 import com.supermarketpos.model.Bill;
 import com.supermarketpos.model.BillItem;
+import com.supermarketpos.util.AlertUtil;
 import com.supermarketpos.util.CurrencyUtil;
 import com.supermarketpos.util.DateUtil;
 import com.supermarketpos.util.PrintUtil;
@@ -18,16 +19,23 @@ public class ReceiptService {
 
     /**
      * Builds an HTML receipt string from the bill and template,
-     * then sends it to the default printer via PrintUtil.
+     * then saves it to a file via PrintUtil.
      */
     public void printReceipt(Bill bill) {
         try {
             String html = buildHtml(bill);
-            PrintUtil.printHtml(html, "Receipt-" + bill.getInvoiceNumber());
-            log.info("Receipt printed: " + bill.getInvoiceNumber());
+            String filePath = PrintUtil.printHtml(html, "Receipt-" + bill.getInvoiceNumber());
+            log.info("Receipt saved: " + bill.getInvoiceNumber());
+            javafx.application.Platform.runLater(() ->
+                AlertUtil.showInfo("Receipt Saved",
+                    "Receipt saved successfully.\nFile: " + filePath)
+            );
         } catch (Exception ex) {
-            log.log(Level.SEVERE, "Failed to print receipt: " + bill.getInvoiceNumber(), ex);
-            throw new RuntimeException("Printer unavailable. Receipt could not be printed.", ex);
+            log.log(Level.SEVERE, "Failed to save receipt: " + bill.getInvoiceNumber(), ex);
+            javafx.application.Platform.runLater(() ->
+                AlertUtil.showError("Receipt Error",
+                    "Receipt could not be saved: " + ex.getMessage())
+            );
         }
     }
 

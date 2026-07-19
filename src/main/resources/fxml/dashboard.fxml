@@ -1,92 +1,355 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.supermarketpos.controller.DashboardController"
-            stylesheets="@../css/dashboard.css" styleClass="dashboard-root">
+            stylesheets="@../css/dashboard.css"
+            prefWidth="1280" prefHeight="800">
 
+    <!-- ── LEFT SIDEBAR ────────────────────────────────────────────────── -->
+    <left>
+        <VBox styleClass="sidebar">
+            <!-- Brand / Logo Header -->
+            <HBox styleClass="logo-container">
+                <Label text="🛒" styleClass="logo-icon"/>
+                <Label fx:id="storeNameLabel" text="SmartMart" styleClass="logo-text-brand"/>
+                <Label text="POS" styleClass="logo-text-pos"/>
+            </HBox>
+
+            <!-- Navigation Links List -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="sidebar-scroll">
+                <VBox spacing="4.0">
+                    <padding><Insets top="10.0" right="12.0" bottom="10.0" left="12.0"/></padding>
+
+                    <Button text="🏠  Dashboard" styleClass="sidebar-nav-button, active" maxWidth="Infinity"/>
+                    <Button fx:id="newBillButton" text="🛒  New Bill" onAction="#onNewBill" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="productsButton" text="🏷️  Products" onAction="#onProducts" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="inventoryButton" text="📦  Inventory" onAction="#onInventory" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="purchasesButton" text="🛍️  Purchases" onAction="#onPurchases" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="customersNavButton" text="👥  Customers" onAction="#onCustomersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="suppliersNavButton" text="🚚  Suppliers" onAction="#onSuppliersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="reportsButton" text="📊  Reports" onAction="#onReports" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="settingsButton" text="⚙️  Settings" onAction="#onSettings" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="usersNavButton" text="👤  Users" onAction="#onUsersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="backupNavButton" text="💾  Backup" onAction="#onBackupNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                </VBox>
+            </ScrollPane>
+
+            <!-- Sidebar Footer User Profile -->
+            <VBox>
+                <padding><Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/></padding>
+                <HBox styleClass="sidebar-user-card" alignment="CENTER_LEFT">
+                    <Label text="👤" styleClass="avatar-circle"/>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label fx:id="loggedUserLabel" text="admin" styleClass="user-name-text"/>
+                        <Label fx:id="roleLabel" text="Administrator" styleClass="user-role-text"/>
+                        <Label text="🟢 Online" styleClass="status-online"/>
+                    </VBox>
+                    <Button fx:id="logoutButton" text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ── TOP HEADER BAR ──────────────────────────────────────────────── -->
     <top>
-        <HBox styleClass="top-bar" spacing="15.0" alignment="CENTER_LEFT">
-            <padding><Insets top="10.0" right="20.0" bottom="10.0" left="20.0"/></padding>
-            <Label fx:id="storeNameLabel" styleClass="store-name" text="SmartMart POS"/>
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="15.0">
+            <Button text="🛒" styleClass="menu-toggle-btn"/>
+
+            <HBox styleClass="search-box">
+                <Label text="🔍 " style="-fx-text-fill: #94a3b8;"/>
+                <TextField promptText="Search product by name / barcode / SKU" styleClass="search-field" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="loggedUserLabel" styleClass="user-label"/>
-            <Label fx:id="roleLabel" styleClass="role-label"/>
-            <Label fx:id="currentTimeLabel" styleClass="time-label"/>
-            <Button fx:id="logoutButton" text="Logout" onAction="#onLogout"/>
+
+            <Label fx:id="dateLabel" text="19 Jul 2026 Sunday" styleClass="header-info-label"/>
+            <Label text="|" styleClass="header-info-label" style="-fx-text-fill: #cbd5e1;"/>
+            <Label fx:id="currentTimeLabel" text="01:39 PM" styleClass="header-info-label"/>
+            <Button fx:id="refreshButton" text="🔄" onAction="#onRefresh" styleClass="menu-toggle-btn"/>
+            <Button text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
         </HBox>
     </top>
 
+    <!-- ── CENTER MAIN CONTENT ─────────────────────────────────────────── -->
     <center>
-        <VBox spacing="20.0">
-            <padding><Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/></padding>
+        <ScrollPane fitToWidth="true" styleClass="sidebar-scroll">
+            <VBox styleClass="dashboard-content">
 
-            <HBox spacing="15.0" styleClass="cards-row">
-                <VBox styleClass="dashboard-card">
-                    <Label text="Today's Sales" styleClass="card-title"/>
-                    <Label fx:id="todaySalesLabel" styleClass="card-value"/>
+                <!-- Welcome Header -->
+                <VBox spacing="4.0">
+                    <Label text="Dashboard" styleClass="welcome-title"/>
+                    <Label text="Welcome back, admin! Here's what's happening with your store." styleClass="welcome-subtitle"/>
                 </VBox>
-                <VBox styleClass="dashboard-card">
-                    <Label text="Today's Profit" styleClass="card-title"/>
-                    <Label fx:id="todayProfitLabel" styleClass="card-value"/>
-                </VBox>
-                <VBox styleClass="dashboard-card">
-                    <Label text="Products" styleClass="card-title"/>
-                    <Label fx:id="productsCountLabel" styleClass="card-value"/>
-                </VBox>
-                <VBox styleClass="dashboard-card">
-                    <Label text="Customers" styleClass="card-title"/>
-                    <Label fx:id="customersCountLabel" styleClass="card-value"/>
-                </VBox>
-                <VBox styleClass="dashboard-card">
-                    <Label text="Suppliers" styleClass="card-title"/>
-                    <Label fx:id="suppliersCountLabel" styleClass="card-value"/>
-                </VBox>
-                <VBox styleClass="dashboard-card low-stock-card">
-                    <Label text="Low Stock" styleClass="card-title"/>
-                    <Label fx:id="lowStockLabel" styleClass="card-value"/>
-                </VBox>
-            </HBox>
 
-            <HBox spacing="10.0" styleClass="quick-actions-row">
-                <Button fx:id="newBillButton" text="New Bill" onAction="#onNewBill"/>
-                <Button fx:id="productsButton" text="Products" onAction="#onProducts"/>
-                <Button fx:id="inventoryButton" text="Inventory" onAction="#onInventory"/>
-                <Button fx:id="purchasesButton" text="Purchases" onAction="#onPurchases"/>
-                <Button fx:id="reportsButton" text="Reports" onAction="#onReports"/>
-                <Button fx:id="settingsButton" text="Settings" onAction="#onSettings"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="refreshButton" text="Refresh" onAction="#onRefresh"/>
-            </HBox>
+                <!-- KPI Cards Row -->
+                <GridPane hgap="14.0" vgap="14.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="16.66"/>
+                        <ColumnConstraints percentWidth="16.66"/>
+                        <ColumnConstraints percentWidth="16.66"/>
+                        <ColumnConstraints percentWidth="16.66"/>
+                        <ColumnConstraints percentWidth="16.66"/>
+                        <ColumnConstraints percentWidth="16.66"/>
+                    </columnConstraints>
 
-            <VBox spacing="8.0" VBox.vgrow="ALWAYS">
-                <Label text="Recent Bills" styleClass="section-title"/>
-                <TableView fx:id="recentBillsTable" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="invoiceColumn" text="Invoice Number" prefWidth="150.0"/>
-                        <TableColumn fx:id="customerColumn" text="Customer" prefWidth="150.0"/>
-                        <TableColumn fx:id="amountColumn" text="Amount" prefWidth="100.0"/>
-                        <TableColumn fx:id="paymentTypeColumn" text="Payment Type" prefWidth="120.0"/>
-                        <TableColumn fx:id="dateColumn" text="Date" prefWidth="160.0"/>
-                    </columns>
-                </TableView>
+                    <!-- Today's Sales -->
+                    <HBox styleClass="kpi-card" GridPane.columnIndex="0">
+                        <Label text="🛍️" styleClass="kpi-icon-box, kpi-icon-sales"/>
+                        <VBox spacing="2">
+                            <Label text="Today's Sales" styleClass="kpi-title"/>
+                            <Label fx:id="todaySalesLabel" text="₹7.80" styleClass="kpi-value"/>
+                            <Label text="↗ 12.5% vs yesterday" styleClass="kpi-trend-green"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Today's Profit -->
+                    <HBox styleClass="kpi-card" GridPane.columnIndex="1">
+                        <Label text="📈" styleClass="kpi-icon-box, kpi-icon-profit"/>
+                        <VBox spacing="2">
+                            <Label text="Today's Profit" styleClass="kpi-title"/>
+                            <Label fx:id="todayProfitLabel" text="₹3.60" styleClass="kpi-value"/>
+                            <Label text="↗ 8.3% vs yesterday" styleClass="kpi-trend-green"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Total Products -->
+                    <HBox styleClass="kpi-card" GridPane.columnIndex="2">
+                        <Label text="📦" styleClass="kpi-icon-box, kpi-icon-products"/>
+                        <VBox spacing="2">
+                            <Label text="Total Products" styleClass="kpi-title"/>
+                            <Label fx:id="productsCountLabel" text="6" styleClass="kpi-value"/>
+                            <Label text="Active products" styleClass="kpi-subtext"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Customers -->
+                    <HBox styleClass="kpi-card" GridPane.columnIndex="3">
+                        <Label text="👥" styleClass="kpi-icon-box, kpi-icon-customers"/>
+                        <VBox spacing="2">
+                            <Label text="Customers" styleClass="kpi-title"/>
+                            <Label fx:id="customersCountLabel" text="0" styleClass="kpi-value"/>
+                            <Label text="Total customers" styleClass="kpi-subtext"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Suppliers -->
+                    <HBox styleClass="kpi-card" GridPane.columnIndex="4">
+                        <Label text="🚚" styleClass="kpi-icon-box, kpi-icon-suppliers"/>
+                        <VBox spacing="2">
+                            <Label text="Suppliers" styleClass="kpi-title"/>
+                            <Label fx:id="suppliersCountLabel" text="2" styleClass="kpi-value"/>
+                            <Label text="Active suppliers" styleClass="kpi-subtext"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Low Stock Items -->
+                    <HBox styleClass="kpi-card" GridPane.columnIndex="5">
+                        <Label text="⚠️" styleClass="kpi-icon-box, kpi-icon-lowstock"/>
+                        <VBox spacing="2">
+                            <Label text="Low Stock Items" styleClass="kpi-title"/>
+                            <Label fx:id="lowStockLabel" text="1" styleClass="kpi-value"/>
+                            <Label text="Need attention" styleClass="kpi-trend-warning"/>
+                        </VBox>
+                    </HBox>
+                </GridPane>
+
+                <!-- Middle Section: Recent Bills & Sales Overview -->
+                <HBox spacing="16.0">
+                    <!-- Recent Bills Table Card -->
+                    <VBox styleClass="content-card" HBox.hgrow="ALWAYS" prefWidth="540">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="📄  Recent Bills" styleClass="card-header-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Hyperlink text="View All >" onAction="#onReports" styleClass="link-view-all"/>
+                        </HBox>
+
+                        <TableView fx:id="recentBillsTable" prefHeight="260">
+                            <columns>
+                                <TableColumn fx:id="invoiceColumn" text="Invoice No" prefWidth="140.0"/>
+                                <TableColumn fx:id="customerColumn" text="Customer" prefWidth="90.0"/>
+                                <TableColumn fx:id="amountColumn" text="Amount" prefWidth="80.0"/>
+                                <TableColumn fx:id="paymentTypeColumn" text="Payment Type" prefWidth="95.0"/>
+                                <TableColumn fx:id="dateColumn" text="Date" prefWidth="120.0"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Sales Overview Chart Card -->
+                    <VBox styleClass="content-card" HBox.hgrow="ALWAYS" prefWidth="580">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="📈  Sales Overview" styleClass="card-header-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <ComboBox fx:id="chartRangeCombo" promptText="This Month"/>
+                            <ComboBox fx:id="chartTypeCombo" promptText="Line"/>
+                        </HBox>
+
+                        <LineChart fx:id="salesOverviewChart" prefHeight="200" createSymbols="true" legendVisible="false">
+                            <xAxis><CategoryAxis side="BOTTOM"/></xAxis>
+                            <yAxis><NumberAxis side="LEFT"/></yAxis>
+                        </LineChart>
+
+                        <HBox alignment="CENTER" spacing="24" style="-fx-border-color: #f1f5f9; -fx-border-width: 1px 0 0 0; -fx-padding: 10 0 0 0;">
+                            <VBox alignment="CENTER">
+                                <Label text="Total Sales" styleClass="kpi-subtext"/>
+                                <Label fx:id="totalSalesSummaryLabel" text="₹230.50" styleClass="kpi-title" style="-fx-font-size: 14px;"/>
+                            </VBox>
+                            <VBox alignment="CENTER">
+                                <Label text="Total Bills" styleClass="kpi-subtext"/>
+                                <Label fx:id="totalBillsSummaryLabel" text="28" styleClass="kpi-title" style="-fx-font-size: 14px;"/>
+                            </VBox>
+                            <VBox alignment="CENTER">
+                                <Label text="Avg Order Value" styleClass="kpi-subtext"/>
+                                <Label fx:id="avgOrderSummaryLabel" text="₹8.23" styleClass="kpi-title" style="-fx-font-size: 14px;"/>
+                            </VBox>
+                            <VBox alignment="CENTER">
+                                <Label text="Best Day" styleClass="kpi-subtext"/>
+                                <Label fx:id="bestDaySummaryLabel" text="15 Jul (₹68.40)" styleClass="kpi-title" style="-fx-font-size: 14px;"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <!-- Bottom Section: Low Stock, Top Selling Products, Quick Actions -->
+                <HBox spacing="16.0">
+                    <!-- Low Stock Items Card -->
+                    <VBox styleClass="content-card" HBox.hgrow="ALWAYS" prefWidth="380">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="⚠️  Low Stock Items" styleClass="card-header-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Hyperlink text="View All >" onAction="#onInventory" styleClass="link-view-all"/>
+                        </HBox>
+
+                        <TableView fx:id="lowStockTable" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="lowStockProductCol" text="Product" prefWidth="110.0"/>
+                                <TableColumn fx:id="lowStockSkuCol" text="SKU" prefWidth="65.0"/>
+                                <TableColumn fx:id="lowStockQtyCol" text="Stock" prefWidth="50.0"/>
+                                <TableColumn fx:id="lowStockMinCol" text="Min" prefWidth="45.0"/>
+                                <TableColumn fx:id="lowStockStatusCol" text="Status" prefWidth="90.0"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Top Selling Products Card -->
+                    <VBox styleClass="content-card" HBox.hgrow="ALWAYS" prefWidth="380">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="🏆  Top Selling Products" styleClass="card-header-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Hyperlink text="View All >" onAction="#onReports" styleClass="link-view-all"/>
+                        </HBox>
+
+                        <TableView fx:id="topSellingTable" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="topRankCol" text="#" prefWidth="30.0"/>
+                                <TableColumn fx:id="topProductCol" text="Product" prefWidth="150.0"/>
+                                <TableColumn fx:id="topSoldCol" text="Total Sold" prefWidth="80.0"/>
+                                <TableColumn fx:id="topRevenueCol" text="Revenue" prefWidth="90.0"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Quick Actions Grid Tile Card -->
+                    <VBox styleClass="content-card" prefWidth="340">
+                        <Label text="⚡  Quick Actions" styleClass="card-header-title"/>
+
+                        <GridPane hgap="10.0" vgap="10.0" VBox.vgrow="ALWAYS">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="50.0"/>
+                                <ColumnConstraints percentWidth="50.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints percentHeight="33.3"/>
+                                <RowConstraints percentHeight="33.3"/>
+                                <RowConstraints percentHeight="33.3"/>
+                            </rowConstraints>
+
+                            <!-- New Bill -->
+                            <VBox onMouseClicked="#onNewBill" styleClass="quick-action-tile" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <Label text="🛒" style="-fx-font-size: 16px;"/>
+                                    <Label text="New Bill" styleClass="tile-title"/>
+                                </HBox>
+                                <Label text="Create new invoice" styleClass="tile-desc"/>
+                            </VBox>
+
+                            <!-- Add Product -->
+                            <VBox onMouseClicked="#onProducts" styleClass="quick-action-tile" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <Label text="➕" style="-fx-font-size: 16px;"/>
+                                    <Label text="Add Product" styleClass="tile-title"/>
+                                </HBox>
+                                <Label text="Add new product" styleClass="tile-desc"/>
+                            </VBox>
+
+                            <!-- Add Purchase -->
+                            <VBox onMouseClicked="#onPurchases" styleClass="quick-action-tile" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <Label text="🛍️" style="-fx-font-size: 16px;"/>
+                                    <Label text="Add Purchase" styleClass="tile-title"/>
+                                </HBox>
+                                <Label text="Record purchase" styleClass="tile-desc"/>
+                            </VBox>
+
+                            <!-- Stock Adjustment -->
+                            <VBox onMouseClicked="#onInventory" styleClass="quick-action-tile" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <Label text="🔄" style="-fx-font-size: 16px;"/>
+                                    <Label text="Stock Adjustment" styleClass="tile-title"/>
+                                </HBox>
+                                <Label text="Adjust inventory" styleClass="tile-desc"/>
+                            </VBox>
+
+                            <!-- Sales Report -->
+                            <VBox onMouseClicked="#onReports" styleClass="quick-action-tile" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <Label text="📊" style="-fx-font-size: 16px;"/>
+                                    <Label text="Sales Report" styleClass="tile-title"/>
+                                </HBox>
+                                <Label text="View sales report" styleClass="tile-desc"/>
+                            </VBox>
+
+                            <!-- Backup Data -->
+                            <VBox onMouseClicked="#onBackupNav" styleClass="quick-action-tile" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <Label text="☁️" style="-fx-font-size: 16px;"/>
+                                    <Label text="Backup Data" styleClass="tile-title"/>
+                                </HBox>
+                                <Label text="Backup database" styleClass="tile-desc"/>
+                            </VBox>
+                        </GridPane>
+                    </VBox>
+                </HBox>
+
             </VBox>
-        </VBox>
+        </ScrollPane>
     </center>
 
+    <!-- ── FOOTER BAR ──────────────────────────────────────────────────── -->
     <bottom>
-        <HBox alignment="CENTER_RIGHT" styleClass="bottom-bar">
-            <padding><Insets top="5.0" right="15.0" bottom="5.0" left="15.0"/></padding>
-            <Label fx:id="appVersionLabel" styleClass="version-label"/>
+        <HBox styleClass="footer-bar" alignment="CENTER_LEFT">
+            <Label fx:id="appVersionLabel" text="SmartMart POS v1.0.0" styleClass="footer-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="© 2026 SmartMart POS. All rights reserved." styleClass="footer-text"/>
         </HBox>
     </bottom>
 </BorderPane>

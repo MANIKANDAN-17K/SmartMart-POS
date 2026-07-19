@@ -131,6 +131,7 @@ public class CategoryController {
             categoryList.setAll(categoryService.getAllCategories());
         } catch (SQLException e) {
             AlertUtil.showError("Database Error", "Unable to load categories: " + e.getMessage());
+            return;
         }
     }
 

@@ -14,6 +14,9 @@ public class CustomerDao {
     private static final Logger log = Logger.getLogger(CustomerDao.class.getName());
 
     public void insert(Connection conn, Customer customer) throws SQLException {
+        if (customer.getCreatedAt() == null) {
+            customer.setCreatedAt(java.time.LocalDateTime.now());
+        }
         String sql = """
                 INSERT INTO customers (name, phone, email, address, status, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?)

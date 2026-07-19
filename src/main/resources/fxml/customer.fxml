@@ -1,110 +1,230 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.supermarketpos.controller.CustomerController"
-            stylesheets="@../css/common.css"
-            prefWidth="1200" prefHeight="780">
+            stylesheets="@../css/dashboard.css"
+            prefWidth="1280" prefHeight="800">
 
-    <!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
+    <!-- ── LEFT SIDEBAR ────────────────────────────────────────────────── -->
+    <left>
+        <VBox styleClass="sidebar">
+            <!-- Brand / Logo Header -->
+            <HBox styleClass="logo-container">
+                <Label text="🛒" styleClass="logo-icon"/>
+                <Label text="SmartMart" styleClass="logo-text-brand"/>
+                <Label text="POS" styleClass="logo-text-pos"/>
+            </HBox>
+
+            <!-- Navigation Links List -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="sidebar-scroll">
+                <VBox spacing="4.0">
+                    <padding><Insets top="10.0" right="12.0" bottom="10.0" left="12.0"/></padding>
+
+                    <Button fx:id="btnDashboardNav" text="🏠  Dashboard" onAction="#onDashboard" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnNewBillNav" text="🛒  New Bill" onAction="#onNewBill" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnProductsNav" text="🏷️  Products" onAction="#onProducts" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnInventoryNav" text="📦  Inventory" onAction="#onInventory" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnPurchasesNav" text="🛍️  Purchases" onAction="#onPurchases" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnCustomersNav" text="👥  Customers" onAction="#onCustomersNav" styleClass="sidebar-nav-button, active" maxWidth="Infinity"/>
+                    <Button fx:id="btnSuppliersNav" text="🚚  Suppliers" onAction="#onSuppliersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnReportsNav" text="📊  Reports" onAction="#onReports" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnSettingsNav" text="⚙️  Settings" onAction="#onSettings" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnUsersNav" text="👤  Users" onAction="#onUsersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnBackupNav" text="💾  Backup" onAction="#onBackupNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                </VBox>
+            </ScrollPane>
+
+            <!-- Sidebar User Profile -->
+            <VBox>
+                <padding><Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/></padding>
+                <HBox styleClass="sidebar-user-card" alignment="CENTER_LEFT">
+                    <Label text="👤" styleClass="avatar-circle"/>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label fx:id="loggedUserLabel" text="admin" styleClass="user-name-text"/>
+                        <Label fx:id="roleLabel" text="Administrator" styleClass="user-role-text"/>
+                        <Label text="🟢 Online" styleClass="status-online"/>
+                    </VBox>
+                    <Button fx:id="logoutButton" text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ── TOP HEADER BAR ──────────────────────────────────────────────── -->
     <top>
-        <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="16">
-            <Label text="Customer Management" styleClass="page-title"/>
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="15.0">
+            <Button text="🛒" styleClass="menu-toggle-btn"/>
+
+            <HBox styleClass="search-box">
+                <Label text="🔍 " style="-fx-text-fill: #94a3b8;"/>
+                <TextField fx:id="tfSearch" promptText="Search customer by name or phone..." styleClass="search-field" onAction="#onSearch" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
             <Region HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="tfSearch" promptText="Search by name or mobile…" prefWidth="260"/>
-            <Button text="Search"  onAction="#onSearch"  styleClass="btn-primary"/>
-            <Button text="Refresh" onAction="#onRefresh" styleClass="btn-secondary"/>
+
+            <Label fx:id="dateLabel" text="19 Jul 2026 Sunday" styleClass="header-info-label"/>
+            <Label text="|" styleClass="header-info-label" style="-fx-text-fill: #cbd5e1;"/>
+            <Label fx:id="currentTimeLabel" text="01:39 PM" styleClass="header-info-label"/>
+            <Button fx:id="refreshButton" text="🔄" onAction="#onRefresh" styleClass="menu-toggle-btn"/>
+            <Button text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
         </HBox>
     </top>
 
-    <!-- ══ MAIN ════════════════════════════════════════════════════════════ -->
+    <!-- ── CENTER CONTENT ─────────────────────────────────────────────── -->
     <center>
-        <HBox spacing="12" style="-fx-padding:12;">
+        <ScrollPane fitToWidth="true" styleClass="sidebar-scroll">
+            <VBox styleClass="dashboard-content">
 
-            <!-- LEFT: form + buttons ──────────────────────────────────────── -->
-            <VBox spacing="10" prefWidth="280" styleClass="side-panel">
-                <Label fx:id="lblFormTitle" text="New Customer" styleClass="section-title"/>
-
-                <Label text="Name *" styleClass="field-label"/>
-                <TextField fx:id="tfName" promptText="Full name"/>
-
-                <Label text="Mobile *" styleClass="field-label"/>
-                <TextField fx:id="tfPhone" promptText="e.g. 9876543210"/>
-
-                <Label text="Email" styleClass="field-label"/>
-                <TextField fx:id="tfEmail" promptText="optional"/>
-
-                <Label text="Address" styleClass="field-label"/>
-                <TextArea fx:id="taAddress" promptText="optional" prefRowCount="3" wrapText="true"/>
-
-                <Separator/>
-
-                <HBox spacing="8">
-                    <Button fx:id="btnAdd"    text="Add"    onAction="#onAdd"    styleClass="btn-success" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                    <Button fx:id="btnUpdate" text="Update" onAction="#onUpdate" styleClass="btn-primary"  HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
-                </HBox>
-                <HBox spacing="8">
-                    <Button fx:id="btnActivate"   text="Activate"   onAction="#onActivate"   styleClass="btn-success-outline" HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
-                    <Button fx:id="btnDeactivate" text="Deactivate" onAction="#onDeactivate" styleClass="btn-danger-outline"  HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
-                </HBox>
-                <Button fx:id="btnViewHistory" text="View Purchase History" onAction="#onViewHistory"
-                        styleClass="btn-secondary" maxWidth="Infinity" disable="true"/>
-                <Button text="Clear" onAction="#onClear" styleClass="btn-sm" maxWidth="Infinity"/>
-
-                <Separator/>
-
-                <!-- Customer summary card -->
-                <VBox styleClass="summary-card" spacing="5">
-                    <Label text="Selected Customer" styleClass="section-title"/>
-                    <Label fx:id="lblSummaryName"    text="—" styleClass="summary-value-lg"/>
-                    <Label fx:id="lblSummaryPhone"   text="—" styleClass="label-muted"/>
-                    <Label fx:id="lblSummaryEmail"   text="—" styleClass="label-muted"/>
-                    <Label fx:id="lblSummaryAddress" text="—" styleClass="label-muted" wrapText="true"/>
-                    <HBox spacing="6" alignment="CENTER_LEFT">
-                        <Label text="Status:" styleClass="label-muted"/>
-                        <Label fx:id="lblSummaryStatus" text="—"/>
-                    </HBox>
-                    <HBox spacing="6" alignment="CENTER_LEFT">
-                        <Label text="Joined:" styleClass="label-muted"/>
-                        <Label fx:id="lblSummaryJoined" text="—" styleClass="label-muted"/>
-                    </HBox>
-                </VBox>
-            </VBox>
-
-            <!-- RIGHT: tables ─────────────────────────────────────────────── -->
-            <VBox spacing="10" HBox.hgrow="ALWAYS">
-
-                <!-- Customer table -->
-                <TableView fx:id="tblCustomers" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="colName"      text="Name"         prefWidth="200"/>
-                        <TableColumn fx:id="colPhone"     text="Mobile"       prefWidth="130"/>
-                        <TableColumn fx:id="colEmail"     text="Email"        prefWidth="200"/>
-                        <TableColumn fx:id="colStatus"    text="Status"       prefWidth="90"/>
-                        <TableColumn fx:id="colCreatedAt" text="Registered"   prefWidth="160"/>
-                    </columns>
-                    <placeholder><Label text="No customers found. Add one using the form."/></placeholder>
-                </TableView>
-
-                <!-- Purchase history (hidden until requested) -->
-                <VBox fx:id="pnlHistory" spacing="8" styleClass="history-panel">
-                    <Label text="Purchase History" styleClass="section-title"/>
-                    <TableView fx:id="tblHistory" prefHeight="240">
-                        <columns>
-                            <TableColumn fx:id="colHInvoice" text="Invoice #"       prefWidth="160"/>
-                            <TableColumn fx:id="colHDate"    text="Date"            prefWidth="150"/>
-                            <TableColumn fx:id="colHItems"   text="Items"           prefWidth="70"  style="-fx-alignment:CENTER_RIGHT;"/>
-                            <TableColumn fx:id="colHTotal"   text="Grand Total"     prefWidth="120" style="-fx-alignment:CENTER_RIGHT;"/>
-                            <TableColumn fx:id="colHPayment" text="Payment"         prefWidth="100"/>
-                            <TableColumn fx:id="colHCashier" text="Cashier"         prefWidth="130"/>
-                        </columns>
-                        <placeholder><Label text="No purchases found for this customer."/></placeholder>
-                    </TableView>
+                <!-- Header Title -->
+                <VBox spacing="4.0">
+                    <Label text="Customers Management" styleClass="welcome-title"/>
+                    <Label text="View, add, update, and manage customer accounts and purchase histories." styleClass="welcome-subtitle"/>
                 </VBox>
 
+                <!-- KPI Cards Row -->
+                <HBox spacing="16.0">
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="👥" styleClass="kpi-icon-box, kpi-icon-customers"/>
+                        <VBox spacing="2">
+                            <Label text="Total Customers" styleClass="kpi-title"/>
+                            <Label fx:id="lblTotalCustomers" text="0" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="🟢" styleClass="kpi-icon-box, kpi-icon-sales"/>
+                        <VBox spacing="2">
+                            <Label text="Active Customers" styleClass="kpi-title"/>
+                            <Label fx:id="lblActiveCustomers" text="0" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="🛍️" styleClass="kpi-icon-box, kpi-icon-profit"/>
+                        <VBox spacing="2">
+                            <Label text="Total Orders" styleClass="kpi-title"/>
+                            <Label fx:id="lblTotalPurchases" text="0" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+                </HBox>
+
+                <!-- Main Section: Split Pane with Table & Form -->
+                <HBox spacing="16.0">
+
+                    <!-- Customer Table Area -->
+                    <VBox styleClass="content-card" HBox.hgrow="ALWAYS" prefWidth="720">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="Customer Directory" styleClass="card-header-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="🔍 Search" onAction="#onSearch" styleClass="btn-secondary"/>
+                            <Button text="🔄 Refresh" onAction="#onRefresh" styleClass="btn-secondary"/>
+                        </HBox>
+
+                        <TableView fx:id="tblCustomers" prefHeight="380" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colName" text="Customer Name" prefWidth="180.0"/>
+                                <TableColumn fx:id="colPhone" text="Mobile" prefWidth="120.0"/>
+                                <TableColumn fx:id="colEmail" text="Email" prefWidth="180.0"/>
+                                <TableColumn fx:id="colStatus" text="Status" prefWidth="90.0"/>
+                                <TableColumn fx:id="colCreatedAt" text="Registered" prefWidth="140.0"/>
+                            </columns>
+                            <placeholder><Label text="No customer accounts found."/></placeholder>
+                        </TableView>
+
+                        <!-- Purchase History Drawer -->
+                        <VBox fx:id="pnlHistory" spacing="8" style="-fx-padding: 10 0 0 0;">
+                            <Label text="📜 Purchase History" styleClass="card-header-title"/>
+                            <TableView fx:id="tblHistory" prefHeight="200">
+                                <columns>
+                                    <TableColumn fx:id="colHInvoice" text="Invoice #" prefWidth="140.0"/>
+                                    <TableColumn fx:id="colHDate" text="Date" prefWidth="140.0"/>
+                                    <TableColumn fx:id="colHItems" text="Items" prefWidth="60.0"/>
+                                    <TableColumn fx:id="colHTotal" text="Grand Total" prefWidth="100.0"/>
+                                    <TableColumn fx:id="colHPayment" text="Payment" prefWidth="90.0"/>
+                                    <TableColumn fx:id="colHCashier" text="Cashier" prefWidth="100.0"/>
+                                </columns>
+                                <placeholder><Label text="No purchase history found for selected customer."/></placeholder>
+                            </TableView>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Customer Detail & Form Card -->
+                    <VBox styleClass="content-card" prefWidth="380">
+                        <Label fx:id="lblFormTitle" text="New Customer Account" styleClass="card-header-title"/>
+
+                        <VBox spacing="10.0">
+                            <VBox spacing="4">
+                                <Label text="Full Name *" styleClass="form-label"/>
+                                <TextField fx:id="tfName" promptText="Enter customer name"/>
+                            </VBox>
+
+                            <VBox spacing="4">
+                                <Label text="Mobile Number *" styleClass="form-label"/>
+                                <TextField fx:id="tfPhone" promptText="e.g. 9876543210"/>
+                            </VBox>
+
+                            <VBox spacing="4">
+                                <Label text="Email Address" styleClass="form-label"/>
+                                <TextField fx:id="tfEmail" promptText="e.g. customer@example.com"/>
+                            </VBox>
+
+                            <VBox spacing="4">
+                                <Label text="Address" styleClass="form-label"/>
+                                <TextArea fx:id="taAddress" promptText="Enter customer address" prefRowCount="3" wrapText="true"/>
+                            </VBox>
+
+                            <Separator style="-fx-padding: 5 0;"/>
+
+                            <HBox spacing="8">
+                                <Button fx:id="btnAdd" text="Add Customer" onAction="#onAdd" styleClass="btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <Button fx:id="btnUpdate" text="Update" onAction="#onUpdate" styleClass="btn-secondary" HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
+                            </HBox>
+
+                            <HBox spacing="8">
+                                <Button fx:id="btnActivate" text="Activate" onAction="#onActivate" styleClass="btn-secondary" HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
+                                <Button fx:id="btnDeactivate" text="Deactivate" onAction="#onDeactivate" styleClass="btn-danger" HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
+                            </HBox>
+
+                            <Button fx:id="btnViewHistory" text="📜 View Purchase History" onAction="#onViewHistory" styleClass="btn-secondary" maxWidth="Infinity" disable="true"/>
+                            <Button text="Clear Form" onAction="#onClear" styleClass="btn-secondary" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <Separator style="-fx-padding: 10 0 5 0;"/>
+
+                        <!-- Customer Summary Box -->
+                        <VBox spacing="6" style="-fx-background-color: #f8fafc; -fx-background-radius: 8px; -fx-padding: 12;">
+                            <Label text="Selected Customer Summary" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                            <HBox spacing="6"><Label text="Name:" styleClass="kpi-subtext"/><Label fx:id="lblSummaryName" text="—" style="-fx-font-weight: bold;"/></HBox>
+                            <HBox spacing="6"><Label text="Phone:" styleClass="kpi-subtext"/><Label fx:id="lblSummaryPhone" text="—"/></HBox>
+                            <HBox spacing="6"><Label text="Email:" styleClass="kpi-subtext"/><Label fx:id="lblSummaryEmail" text="—"/></HBox>
+                            <HBox spacing="6"><Label text="Status:" styleClass="kpi-subtext"/><Label fx:id="lblSummaryStatus" text="—"/></HBox>
+                        </VBox>
+                    </VBox>
+
+                </HBox>
             </VBox>
-        </HBox>
+        </ScrollPane>
     </center>
+
+    <!-- ── FOOTER BAR ──────────────────────────────────────────────────── -->
+    <bottom>
+        <HBox styleClass="footer-bar" alignment="CENTER_LEFT">
+            <Label text="SmartMart POS v1.0.0 — Customer Module" styleClass="footer-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="© 2026 SmartMart POS. All rights reserved." styleClass="footer-text"/>
+        </HBox>
+    </bottom>
 </BorderPane>

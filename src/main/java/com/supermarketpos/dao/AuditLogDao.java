@@ -5,20 +5,25 @@ import com.supermarketpos.util.DBConnection;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AuditLogDao {
 
     public void insert(AuditLog log) throws SQLException {
+        if (log == null) return;
         String sql = "INSERT INTO audit_log (username, action, details, timestamp) VALUES (?,?,?,?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, log.getUsername());
-            ps.setString(2, log.getAction());
-            ps.setString(3, log.getDetails());
-            ps.setTimestamp(4, Timestamp.valueOf(log.getTimestamp()));
+            ps.setString(1, log.getUsername() != null ? log.getUsername() : "System");
+            ps.setString(2, log.getAction() != null ? log.getAction() : "ACTION");
+            ps.setString(3, log.getDetails() != null ? log.getDetails() : "");
+            LocalDateTime ts = log.getTimestamp() != null ? log.getTimestamp() : LocalDateTime.now();
+            ps.setTimestamp(4, Timestamp.valueOf(ts));
             ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Audit log insert failed: " + e.getMessage());
         }
     }
 
@@ -53,10 +58,14 @@ public class AuditLogDao {
                     log.setUsername(rs.getString("username"));
                     log.setAction(rs.getString("action"));
                     log.setDetails(rs.getString("details"));
-                    log.setTimestamp(rs.getTimestamp("timestamp").toLocalDateTime());
+                    Timestamp ts = rs.getTimestamp("timestamp");
+                    log.setTimestamp(ts != null ? ts.toLocalDateTime() : LocalDateTime.now());
                     logs.add(log);
                 }
             }
+        } catch (SQLException e) {
+            System.err.println("Audit log search failed: " + e.getMessage());
+            return new ArrayList<>();
         }
         return logs;
     }

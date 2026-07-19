@@ -5,55 +5,199 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.supermarketpos.controller.UserManagementController">
-    <padding>
-        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
-    </padding>
+            fx:controller="com.supermarketpos.controller.UserManagementController"
+            stylesheets="@../css/dashboard.css"
+            prefWidth="1280" prefHeight="800">
 
+    <!-- ── LEFT SIDEBAR ────────────────────────────────────────────────── -->
+    <left>
+        <VBox styleClass="sidebar">
+            <!-- Brand / Logo Header -->
+            <HBox styleClass="logo-container">
+                <Label text="🛒" styleClass="logo-icon"/>
+                <Label text="SmartMart" styleClass="logo-text-brand"/>
+                <Label text="POS" styleClass="logo-text-pos"/>
+            </HBox>
+
+            <!-- Navigation Links List -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="sidebar-scroll">
+                <VBox spacing="4.0">
+                    <padding><Insets top="10.0" right="12.0" bottom="10.0" left="12.0"/></padding>
+
+                    <Button fx:id="btnDashboardNav" text="🏠  Dashboard" onAction="#onDashboard" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnNewBillNav" text="🛒  New Bill" onAction="#onNewBill" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnProductsNav" text="🏷️  Products" onAction="#onProducts" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnInventoryNav" text="📦  Inventory" onAction="#onInventory" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnPurchasesNav" text="🛍️  Purchases" onAction="#onPurchases" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnCustomersNav" text="👥  Customers" onAction="#onCustomersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnSuppliersNav" text="🚚  Suppliers" onAction="#onSuppliersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnReportsNav" text="📊  Reports" onAction="#onReports" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnSettingsNav" text="⚙️  Settings" onAction="#onSettings" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnUsersNav" text="👤  Users" onAction="#onUsersNav" styleClass="sidebar-nav-button, active" maxWidth="Infinity"/>
+                    <Button fx:id="btnBackupNav" text="💾  Backup" onAction="#onBackupNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                </VBox>
+            </ScrollPane>
+
+            <!-- Sidebar User Profile -->
+            <VBox>
+                <padding><Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/></padding>
+                <HBox styleClass="sidebar-user-card" alignment="CENTER_LEFT">
+                    <Label text="👤" styleClass="avatar-circle"/>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label fx:id="loggedUserLabel" text="admin" styleClass="user-name-text"/>
+                        <Label fx:id="roleLabel" text="Administrator" styleClass="user-role-text"/>
+                        <Label text="🟢 Online" styleClass="status-online"/>
+                    </VBox>
+                    <Button fx:id="logoutButton" text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ── TOP HEADER BAR ──────────────────────────────────────────────── -->
     <top>
-        <Label text="User Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="15.0">
+            <Button text="🛒" styleClass="menu-toggle-btn"/>
+
+            <HBox styleClass="search-box">
+                <Label text="🔍 " style="-fx-text-fill: #94a3b8;"/>
+                <TextField fx:id="searchField" promptText="Search system user by username..." styleClass="search-field" onAction="#onSearch" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label fx:id="dateLabel" text="19 Jul 2026 Sunday" styleClass="header-info-label"/>
+            <Label text="|" styleClass="header-info-label" style="-fx-text-fill: #cbd5e1;"/>
+            <Label fx:id="currentTimeLabel" text="01:39 PM" styleClass="header-info-label"/>
+            <Button fx:id="refreshButton" text="🔄" onAction="#onRefresh" styleClass="menu-toggle-btn"/>
+            <Button text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
+        </HBox>
     </top>
 
+    <!-- ── CENTER CONTENT ─────────────────────────────────────────────── -->
     <center>
-        <TableView fx:id="userTable">
-            <columns>
-                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="150.0"/>
-                <TableColumn fx:id="roleColumn" text="Role" prefWidth="100.0"/>
-                <TableColumn fx:id="activeColumn" text="Active" prefWidth="80.0"/>
-            </columns>
-        </TableView>
+        <ScrollPane fitToWidth="true" styleClass="sidebar-scroll">
+            <VBox styleClass="dashboard-content">
+
+                <!-- Header Title -->
+                <VBox spacing="4.0">
+                    <Label text="User Accounts &amp; Access Control" styleClass="welcome-title"/>
+                    <Label text="Manage system operator logins, roles, security permissions, and password resets." styleClass="welcome-subtitle"/>
+                </VBox>
+
+                <!-- KPI Summary Cards -->
+                <HBox spacing="16.0">
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="👤" styleClass="kpi-icon-box, kpi-icon-customers"/>
+                        <VBox spacing="2">
+                            <Label text="Total System Users" styleClass="kpi-title"/>
+                            <Label fx:id="lblTotalUsers" text="0" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="🛡️" styleClass="kpi-icon-box, kpi-icon-sales"/>
+                        <VBox spacing="2">
+                            <Label text="Administrators" styleClass="kpi-title"/>
+                            <Label fx:id="lblAdminCount" text="0" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+                    <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="🛒" styleClass="kpi-icon-box, kpi-icon-profit"/>
+                        <VBox spacing="2">
+                            <Label text="Cashiers" styleClass="kpi-title"/>
+                            <Label fx:id="lblCashierCount" text="0" styleClass="kpi-value"/>
+                        </VBox>
+                    </HBox>
+                </HBox>
+
+                <!-- Main Section Split Pane -->
+                <HBox spacing="16.0">
+
+                    <!-- User Directory Table Area -->
+                    <VBox styleClass="content-card" HBox.hgrow="ALWAYS" prefWidth="720">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="System Users Directory" styleClass="card-header-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="🔄 Refresh" onAction="#onRefresh" styleClass="btn-secondary"/>
+                        </HBox>
+
+                        <TableView fx:id="userTable" prefHeight="480" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="220.0"/>
+                                <TableColumn fx:id="roleColumn" text="Assigned Role" prefWidth="180.0"/>
+                                <TableColumn fx:id="activeColumn" text="Status" prefWidth="140.0"/>
+                            </columns>
+                            <placeholder><Label text="No system users found."/></placeholder>
+                        </TableView>
+                    </VBox>
+
+                    <!-- User Account Registration & Detail Card -->
+                    <VBox styleClass="content-card" prefWidth="380">
+                        <Label text="User Account Credentials" styleClass="card-header-title"/>
+
+                        <VBox spacing="10.0">
+                            <VBox spacing="4">
+                                <Label text="Username *" styleClass="form-label"/>
+                                <TextField fx:id="usernameField" promptText="Enter username (e.g. john_cashier)"/>
+                            </VBox>
+
+                            <VBox spacing="4">
+                                <Label text="Password *" styleClass="form-label"/>
+                                <PasswordField fx:id="passwordField" promptText="Enter password"/>
+                            </VBox>
+
+                            <VBox spacing="4">
+                                <Label text="Role *" styleClass="form-label"/>
+                                <ComboBox fx:id="roleComboBox" promptText="Select Role" maxWidth="Infinity"/>
+                            </VBox>
+
+                            <Separator style="-fx-padding: 5 0;"/>
+
+                            <HBox spacing="8">
+                                <Button fx:id="createButton" text="Create User" onAction="#onCreate" styleClass="btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <Button fx:id="updateButton" text="Update Role" onAction="#onUpdate" styleClass="btn-secondary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                            </HBox>
+
+                            <HBox spacing="8">
+                                <Button fx:id="btnActivate" text="Activate Account" onAction="#onActivate" styleClass="btn-secondary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <Button fx:id="deactivateButton" text="Deactivate" onAction="#onDeactivate" styleClass="btn-danger" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                            </HBox>
+
+                            <Button text="🔑 Reset Password" onAction="#onResetPassword" styleClass="btn-secondary" maxWidth="Infinity"/>
+                            <Button text="Clear Form" onAction="#onClear" styleClass="btn-secondary" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <Separator style="-fx-padding: 10 0 5 0;"/>
+
+                        <!-- Security Notice Box -->
+                        <VBox spacing="6" style="-fx-background-color: #f8fafc; -fx-background-radius: 8px; -fx-padding: 12;">
+                            <Label text="🛡️ Access Control Notice" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                            <Label text="Admin users have full access to Settings, Reports, &amp; System Configuration. Cashier users are restricted to Billing &amp; Sales." wrapText="true" styleClass="kpi-subtext"/>
+                        </VBox>
+                    </VBox>
+
+                </HBox>
+            </VBox>
+        </ScrollPane>
     </center>
 
+    <!-- ── FOOTER BAR ──────────────────────────────────────────────────── -->
     <bottom>
-        <VBox spacing="10.0">
-            <padding>
-                <Insets top="15.0"/>
-            </padding>
-            <GridPane hgap="10.0" vgap="8.0">
-                <Label text="Username" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                <Label text="Password" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <PasswordField fx:id="passwordField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                <Label text="Role" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <ComboBox fx:id="roleComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-            </GridPane>
-
-            <HBox spacing="10.0">
-                <Button fx:id="createButton" text="Create" onAction="#onCreate"/>
-                <Button fx:id="updateButton" text="Update" onAction="#onUpdate"/>
-                <Button fx:id="deactivateButton" text="Deactivate" onAction="#onDeactivate"/>
-            </HBox>
-        </VBox>
+        <HBox styleClass="footer-bar" alignment="CENTER_LEFT">
+            <Label text="SmartMart POS v1.0.0 — User Management Module" styleClass="footer-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="© 2026 SmartMart POS. All rights reserved." styleClass="footer-text"/>
+        </HBox>
     </bottom>
 </BorderPane>

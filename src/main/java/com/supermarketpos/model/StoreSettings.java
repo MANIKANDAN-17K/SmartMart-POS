@@ -3,7 +3,7 @@ package com.supermarketpos.model;
 public class StoreSettings {
     private int id = 1;
     private String storeName = "SmartMart POS";
-    private String currencySymbol = "$";
+    private String currencySymbol = "₹";
     private double taxRate = 0.0;
     private String theme = "light";
     private String appVersion = "1.0.0";

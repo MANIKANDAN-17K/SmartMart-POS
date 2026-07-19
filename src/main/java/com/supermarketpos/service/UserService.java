@@ -73,6 +73,13 @@ public class UserService {
         userDao.delete(id);
     }
 
+    public void activateUser(int id) {
+        User existing = userDao.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
+        existing.setActive(true);
+        userDao.update(existing);
+    }
+
     public void resetPassword(int id, String newPassword) {
         User existing = userDao.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));

@@ -7,7 +7,7 @@ import com.supermarketpos.service.AuditService;
 import com.supermarketpos.service.BackupService;
 import com.supermarketpos.service.SettingsService;
 import com.supermarketpos.util.AlertUtil;
-import com.supermarketpos.util.UserSession;
+import com.supermarketpos.session.UserSession;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -17,27 +17,35 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class SettingsController {
 
-    // Store tab
-    @FXML
-    private TextField storeNameField, addressField, gstNumberField, phoneField, emailField;
-    @FXML
-    private javafx.scene.image.ImageView logoPreview;
+    private static final Logger LOGGER = LogManager.getLogger(SettingsController.class);
 
-    @FXML
-    public void onBackToDashboard() {
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/fxml/dashboard.fxml"));
-            javafx.scene.Parent root = loader.load();
-            javafx.stage.Stage stage = (javafx.stage.Stage) storeNameField.getScene().getWindow();
-            stage.setScene(new javafx.scene.Scene(root));
-            stage.setTitle("Dashboard");
-        } catch (java.io.IOException e) {
-            AlertUtil.showError("Could not load Dashboard.");
-        }
-    }
+    // Header & User Profile
+    @FXML private Label loggedUserLabel;
+    @FXML private Label roleLabel;
+    @FXML private Label dateLabel;
+    @FXML private Label currentTimeLabel;
+
+    // Sidebar navigation buttons
+    @FXML private Button btnDashboardNav;
+    @FXML private Button btnNewBillNav;
+    @FXML private Button btnProductsNav;
+    @FXML private Button btnInventoryNav;
+    @FXML private Button btnPurchasesNav;
+    @FXML private Button btnCustomersNav;
+    @FXML private Button btnSuppliersNav;
+    @FXML private Button btnReportsNav;
+    @FXML private Button btnSettingsNav;
+    @FXML private Button btnUsersNav;
+    @FXML private Button btnBackupNav;
+    @FXML private Button refreshButton;
+    @FXML private Button logoutButton;
+
+    private javafx.animation.Timeline clockTimeline;
 
     // Tax tab
     @FXML
@@ -73,38 +81,77 @@ public class SettingsController {
     private final BackupService backupService = new BackupService();
     private final AuditService auditService = new AuditService();
 
+    // Store tab
+    @FXML private TextField storeNameField, addressField, gstNumberField, phoneField, emailField;
+    @FXML private javafx.scene.image.ImageView logoPreview;
+
     @FXML
     public void initialize() {
-        if (!UserSession.getInstance().isAdmin()) {
-            AlertUtil.showError("Access denied. Only ADMIN users can access Settings.");
-            return;
-        }
+        loadUserInfo();
+        startClock();
         loadStoreSettings();
         loadTaxSettings();
         refreshAuditLogs();
+    }
+
+    private void loadUserInfo() {
+        var currentUser = UserSession.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            if (loggedUserLabel != null) loggedUserLabel.setText(currentUser.getUsername());
+            if (roleLabel != null) roleLabel.setText(UserSession.getInstance().getCurrentRole().name());
+        } else {
+            if (loggedUserLabel != null) loggedUserLabel.setText("admin");
+            if (roleLabel != null) roleLabel.setText("Administrator");
+        }
+    }
+
+    private void startClock() {
+        updateDateAndTime();
+        clockTimeline = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1),
+                        e -> updateDateAndTime()));
+        clockTimeline.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        clockTimeline.play();
+    }
+
+    private void updateDateAndTime() {
+        java.time.LocalDate now = java.time.LocalDate.now();
+        java.time.format.DateTimeFormatter dateFmt = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy EEEE");
+        if (dateLabel != null) dateLabel.setText(now.format(dateFmt));
+        if (currentTimeLabel != null) currentTimeLabel.setText(com.supermarketpos.util.DateUtil.nowDisplay());
     }
 
     private void loadStoreSettings() {
         try {
             StoreSettings s = settingsService.getStoreSettings();
             if (s != null) {
-                storeNameField.setText(s.getStoreName());
-                addressField.setText(s.getAddress());
-                gstNumberField.setText(s.getGstNumber());
-                phoneField.setText(s.getPhone());
-                emailField.setText(s.getEmail());
-                receiptHeaderField.setText(s.getReceiptHeader());
-                receiptFooterField.setText(s.getReceiptFooter());
-                showLogoCheck.setSelected(s.isShowLogoOnReceipt());
-                showGstCheck.setSelected(s.isShowGstOnReceipt());
-                showCashierCheck.setSelected(s.isShowCashierOnReceipt());
-                if ("dark".equals(s.getTheme()))
-                    darkThemeRadio.setSelected(true);
-                else
-                    lightThemeRadio.setSelected(true);
+                if (storeNameField != null) storeNameField.setText(s.getStoreName() != null ? s.getStoreName() : "SmartMart POS");
+                if (addressField != null) addressField.setText(s.getAddress() != null ? s.getAddress() : "");
+                if (gstNumberField != null) gstNumberField.setText(s.getGstNumber() != null ? s.getGstNumber() : "");
+                if (phoneField != null) phoneField.setText(s.getPhone() != null ? s.getPhone() : "");
+                if (emailField != null) emailField.setText(s.getEmail() != null ? s.getEmail() : "");
+                if (receiptHeaderField != null) receiptHeaderField.setText(s.getReceiptHeader() != null ? s.getReceiptHeader() : "Welcome to SmartMart Supermarket!");
+                if (receiptFooterField != null) receiptFooterField.setText(s.getReceiptFooter() != null ? s.getReceiptFooter() : "Thank you for shopping with us!");
+                if (showLogoCheck != null) showLogoCheck.setSelected(s.isShowLogoOnReceipt());
+                if (showGstCheck != null) showGstCheck.setSelected(s.isShowGstOnReceipt());
+                if (showCashierCheck != null) showCashierCheck.setSelected(s.isShowCashierOnReceipt());
+                if ("dark".equals(s.getTheme())) {
+                    if (darkThemeRadio != null) darkThemeRadio.setSelected(true);
+                } else {
+                    if (lightThemeRadio != null) lightThemeRadio.setSelected(true);
+                }
+            } else {
+                if (storeNameField != null) storeNameField.setText("SmartMart POS");
+                if (addressField != null) addressField.setText("Main Street Branch, City");
+                if (gstNumberField != null) gstNumberField.setText("33AAAAA0000A1Z5");
+                if (phoneField != null) phoneField.setText("+91 9876543210");
+                if (emailField != null) emailField.setText("contact@smartmart.com");
+                if (receiptHeaderField != null) receiptHeaderField.setText("Welcome to SmartMart Supermarket!");
+                if (receiptFooterField != null) receiptFooterField.setText("Thank you for shopping with us!");
             }
         } catch (Exception e) {
-            AlertUtil.showError("Failed to load store settings.");
+            LOGGER.error("Error loading store settings, using defaults", e);
+            if (storeNameField != null) storeNameField.setText("SmartMart POS");
         }
     }
 
@@ -112,11 +159,16 @@ public class SettingsController {
         try {
             TaxSetting t = settingsService.getTaxSettings();
             if (t != null) {
-                gstPercentageField.setText(String.valueOf(t.getGstPercentage()));
-                gstEnabledCheck.setSelected(t.isGstEnabled());
+                if (gstPercentageField != null) gstPercentageField.setText(String.valueOf(t.getGstPercentage()));
+                if (gstEnabledCheck != null) gstEnabledCheck.setSelected(t.isGstEnabled());
+            } else {
+                if (gstPercentageField != null) gstPercentageField.setText("18.0");
+                if (gstEnabledCheck != null) gstEnabledCheck.setSelected(true);
             }
         } catch (Exception e) {
-            AlertUtil.showError("Failed to load tax settings.");
+            LOGGER.error("Error loading tax settings, using defaults", e);
+            if (gstPercentageField != null) gstPercentageField.setText("18.0");
+            if (gstEnabledCheck != null) gstEnabledCheck.setSelected(true);
         }
     }
 
@@ -135,7 +187,7 @@ public class SettingsController {
             s.setShowGstOnReceipt(showGstCheck.isSelected());
             s.setShowCashierOnReceipt(showCashierCheck.isSelected());
 
-            settingsService.saveStoreSettings(s, UserSession.getInstance().getUsername());
+            settingsService.saveStoreSettings(s, UserSession.getInstance().getCurrentUser().getUsername());
             AlertUtil.showInfo("Store settings saved successfully.");
         } catch (IllegalArgumentException e) {
             AlertUtil.showError(e.getMessage());
@@ -150,7 +202,7 @@ public class SettingsController {
             TaxSetting t = new TaxSetting();
             t.setGstPercentage(Double.parseDouble(gstPercentageField.getText()));
             t.setGstEnabled(gstEnabledCheck.isSelected());
-            settingsService.saveTaxSettings(t, UserSession.getInstance().getUsername());
+            settingsService.saveTaxSettings(t, UserSession.getInstance().getCurrentUser().getUsername());
             AlertUtil.showInfo("Tax settings saved successfully.");
         } catch (NumberFormatException e) {
             AlertUtil.showError("GST percentage must be a valid number.");
@@ -181,7 +233,7 @@ public class SettingsController {
     public void onApplyTheme() {
         try {
             String theme = darkThemeRadio.isSelected() ? "dark" : "light";
-            settingsService.changeTheme(theme, UserSession.getInstance().getUsername());
+            settingsService.changeTheme(theme, UserSession.getInstance().getCurrentUser().getUsername());
             AlertUtil.showInfo("Theme applied.");
         } catch (Exception e) {
             AlertUtil.showError("Failed to apply theme.");
@@ -190,12 +242,12 @@ public class SettingsController {
 
     @FXML
     public void onBackupDatabase() {
-        if (!UserSession.getInstance().isAdmin()) {
+        if (UserSession.getInstance().getCurrentRole() != com.supermarketpos.model.Role.ADMIN) {
             AlertUtil.showError("Only ADMIN users can perform backup.");
             return;
         }
         try {
-            String fileName = backupService.createBackup(UserSession.getInstance().getUsername());
+            String fileName = backupService.createBackup(UserSession.getInstance().getCurrentUser().getUsername());
             backupStatusLabel.setText("Backup created: " + fileName);
             AlertUtil.showInfo("Database backup created successfully: " + fileName);
         } catch (Exception e) {
@@ -205,7 +257,7 @@ public class SettingsController {
 
     @FXML
     public void onRestoreDatabase() {
-        if (!UserSession.getInstance().isAdmin()) {
+        if (UserSession.getInstance().getCurrentRole() != com.supermarketpos.model.Role.ADMIN) {
             AlertUtil.showError("Only ADMIN users can restore the database.");
             return;
         }
@@ -221,7 +273,7 @@ public class SettingsController {
                 if (file != null) {
                     try {
                         backupService.restoreBackup(file.getAbsolutePath(),
-                                UserSession.getInstance().getUsername());
+                                UserSession.getInstance().getCurrentUser().getUsername());
                         AlertUtil.showInfo("Database restored successfully.");
                     } catch (Exception e) {
                         AlertUtil.showError("Restore failed: " + e.getMessage());
@@ -248,11 +300,77 @@ public class SettingsController {
             LocalDate date = auditDatePicker != null ? auditDatePicker.getValue() : null;
 
             List<AuditLog> logs = auditService.getAuditLogs(user, action, date);
-            auditTable.getItems().setAll(logs);
-            auditService.log(UserSession.getInstance().getUsername(), "AUDIT_LOGS_VIEWED", "Viewed audit logs");
+            if (auditTable != null) {
+                auditTable.getItems().setAll(logs != null ? logs : java.util.Collections.emptyList());
+            }
+
+            var sessionUser = UserSession.getInstance().getCurrentUser();
+            String username = sessionUser != null ? sessionUser.getUsername() : "System";
+            auditService.log(username, "AUDIT_LOGS_VIEWED", "Viewed audit logs");
         } catch (Exception e) {
-            AlertUtil.showError("Failed to load audit logs.");
+            AlertUtil.showError("Audit Log Error", "Failed to load audit logs: " + e.getMessage());
         }
     }
 
+    @FXML public void onTriggerBackup() { onBackupDatabase(); }
+    @FXML public void onRestoreBackup() { onRestoreDatabase(); }
+
+    @FXML private void onRefresh() {
+        loadStoreSettings();
+        loadTaxSettings();
+        refreshAuditLogs();
+    }
+
+    private void stopTimers() {
+        if (clockTimeline != null) clockTimeline.stop();
+    }
+
+    private void navigateTo(String fxmlPath, String title, Button sourceButton) {
+        try {
+            stopTimers();
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) (sourceButton != null && sourceButton.getScene() != null ?
+                    sourceButton.getScene().getWindow() : storeNameField.getScene().getWindow());
+            double w = stage.getWidth();
+            double h = stage.getHeight();
+            stage.setScene(new javafx.scene.Scene(root, w, h));
+            stage.setTitle(title);
+        } catch (Exception e) {
+            LOGGER.error("Navigation error to " + title, e);
+            AlertUtil.showError("Navigation Error", "Could not load " + title + " view: " + e.getMessage());
+        }
+    }
+
+    @FXML private void onDashboard() { navigateTo("/fxml/dashboard.fxml", "Dashboard", btnSettingsNav); }
+    @FXML private void onNewBill() { navigateTo("/fxml/billing.fxml", "Billing", btnSettingsNav); }
+    @FXML private void onProducts() { navigateTo("/fxml/product.fxml", "Products", btnSettingsNav); }
+    @FXML private void onInventory() { navigateTo("/fxml/inventory.fxml", "Inventory", btnSettingsNav); }
+    @FXML private void onPurchases() { navigateTo("/fxml/purchase.fxml", "Purchases", btnSettingsNav); }
+    @FXML private void onCustomersNav() { navigateTo("/fxml/customer.fxml", "Customers", btnSettingsNav); }
+    @FXML private void onSuppliersNav() { navigateTo("/fxml/supplier.fxml", "Suppliers", btnSettingsNav); }
+    @FXML private void onReports() { navigateTo("/fxml/report.fxml", "Reports", btnSettingsNav); }
+    @FXML private void onSettings() { onRefresh(); }
+    @FXML private void onUsersNav() {
+        if (UserSession.getInstance().getCurrentRole() != com.supermarketpos.model.Role.ADMIN) {
+            AlertUtil.showError("Access Denied", "Only ADMIN users can manage Users.");
+            return;
+        }
+        navigateTo("/fxml/user_management.fxml", "Users Management", btnSettingsNav);
+    }
+    @FXML private void onBackupNav() { onTriggerBackup(); }
+
+    @FXML
+    private void onLogout() {
+        boolean confirmed = AlertUtil.showConfirm("Confirm Logout", "Are you sure you want to log out?");
+        if (!confirmed) return;
+        stopTimers();
+        new com.supermarketpos.service.AuthService().logout();
+        navigateTo("/fxml/login.fxml", "Login", logoutButton);
+    }
+
+    @FXML
+    public void onBackToDashboard() {
+        onDashboard();
+    }
 }

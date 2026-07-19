@@ -1,174 +1,241 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.supermarketpos.controller.SettingsController"
-            stylesheets="@../css/common.css" prefWidth="900" prefHeight="650">
+            stylesheets="@../css/dashboard.css"
+            prefWidth="1280" prefHeight="800">
 
+    <!-- ── LEFT SIDEBAR ────────────────────────────────────────────────── -->
+    <left>
+        <VBox styleClass="sidebar">
+            <HBox styleClass="logo-container">
+                <Label text="🛒" styleClass="logo-icon"/>
+                <Label text="SmartMart" styleClass="logo-text-brand"/>
+                <Label text="POS" styleClass="logo-text-pos"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="sidebar-scroll">
+                <VBox spacing="4.0">
+                    <padding><Insets top="10.0" right="12.0" bottom="10.0" left="12.0"/></padding>
+
+                    <Button fx:id="btnDashboardNav" text="🏠  Dashboard" onAction="#onDashboard" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnNewBillNav" text="🛒  New Bill" onAction="#onNewBill" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnProductsNav" text="🏷️  Products" onAction="#onProducts" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnInventoryNav" text="📦  Inventory" onAction="#onInventory" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnPurchasesNav" text="🛍️  Purchases" onAction="#onPurchases" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnCustomersNav" text="👥  Customers" onAction="#onCustomersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnSuppliersNav" text="🚚  Suppliers" onAction="#onSuppliersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnReportsNav" text="📊  Reports" onAction="#onReports" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnSettingsNav" text="⚙️  Settings" onAction="#onSettings" styleClass="sidebar-nav-button, active" maxWidth="Infinity"/>
+                    <Button fx:id="btnUsersNav" text="👤  Users" onAction="#onUsersNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                    <Button fx:id="btnBackupNav" text="💾  Backup" onAction="#onBackupNav" styleClass="sidebar-nav-button" maxWidth="Infinity"/>
+                </VBox>
+            </ScrollPane>
+
+            <VBox>
+                <padding><Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/></padding>
+                <HBox styleClass="sidebar-user-card" alignment="CENTER_LEFT">
+                    <Label text="👤" styleClass="avatar-circle"/>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label fx:id="loggedUserLabel" text="admin" styleClass="user-name-text"/>
+                        <Label fx:id="roleLabel" text="Administrator" styleClass="user-role-text"/>
+                        <Label text="🟢 Online" styleClass="status-online"/>
+                    </VBox>
+                    <Button fx:id="logoutButton" text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ── TOP HEADER BAR ──────────────────────────────────────────────── -->
     <top>
-        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
-            <Label text="Store Settings" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="15.0">
+            <Button text="🛒" styleClass="menu-toggle-btn"/>
+
+            <HBox styleClass="search-box">
+                <Label text="⚙️ " style="-fx-text-fill: #94a3b8;"/>
+                <Label text="System Settings &amp; Store Configuration" style="-fx-font-weight: bold; -fx-text-fill: #334155; -fx-font-size: 13px;"/>
+            </HBox>
+
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Dashboard" onAction="#onBackToDashboard" styleClass="btn-secondary"/>
+
+            <Label fx:id="dateLabel" text="19 Jul 2026 Sunday" styleClass="header-info-label"/>
+            <Label text="|" styleClass="header-info-label" style="-fx-text-fill: #cbd5e1;"/>
+            <Label fx:id="currentTimeLabel" text="01:39 PM" styleClass="header-info-label"/>
+            <Button fx:id="refreshButton" text="🔄" onAction="#onRefresh" styleClass="menu-toggle-btn"/>
+            <Button text="🚪 Logout" onAction="#onLogout" styleClass="btn-logout-sidebar"/>
         </HBox>
     </top>
 
+    <!-- ── CENTER CONTENT ─────────────────────────────────────────────── -->
     <center>
-        <TabPane tabClosingPolicy="UNAVAILABLE">
-            <tabs>
-                <!-- Store Tab -->
-                <Tab text="Store Profile">
-                    <content>
-                        <GridPane hgap="10" vgap="10">
-                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-                            <columnConstraints>
-                                <ColumnConstraints minWidth="120" prefWidth="150" />
-                                <ColumnConstraints hgrow="ALWAYS" />
-                            </columnConstraints>
+        <ScrollPane fitToWidth="true" styleClass="sidebar-scroll">
+            <VBox styleClass="dashboard-content">
 
-                            <Label text="Store Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                            <TextField fx:id="storeNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <!-- Header Title -->
+                <VBox spacing="4.0">
+                    <Label text="System Configuration &amp; Administration" styleClass="welcome-title"/>
+                    <Label text="Configure store profile, GST tax rates, receipt formatting, database backup, and security audit logs." styleClass="welcome-subtitle"/>
+                </VBox>
 
-                            <Label text="Address:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                            <TextField fx:id="addressField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="content-card">
+                    <!-- Tab 1: Store Info -->
+                    <Tab text="🏪 Store Profile">
+                        <VBox spacing="14" style="-fx-padding: 16;">
+                            <Label text="Store Information &amp; Branding" styleClass="card-header-title"/>
 
-                            <Label text="GST Number:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                            <TextField fx:id="gstNumberField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-
-                            <Label text="Phone:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                            <TextField fx:id="phoneField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-
-                            <Label text="Email:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                            <TextField fx:id="emailField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-
-                            <Label text="Logo Preview:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                            <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="5" GridPane.columnIndex="1">
-                                <ImageView fx:id="logoPreview" fitWidth="100" fitHeight="50" preserveRatio="true"/>
-                                <Button text="Upload Logo" onAction="#onUploadLogo"/>
+                            <HBox spacing="16">
+                                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                    <Label text="Store Name *" styleClass="form-label"/>
+                                    <TextField fx:id="storeNameField" promptText="Supermarket Store Name"/>
+                                </VBox>
+                                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                    <Label text="GSTIN Number" styleClass="form-label"/>
+                                    <TextField fx:id="gstNumberField" promptText="GST Number (e.g. 33AAAAA0000A1Z5)"/>
+                                </VBox>
                             </HBox>
 
-                            <Button text="Save Settings" onAction="#onSaveStoreSettings" styleClass="btn-primary"
-                                    GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-                        </GridPane>
-                    </content>
-                </Tab>
-
-                <!-- Tax Tab -->
-                <Tab text="Tax Settings">
-                    <content>
-                        <GridPane hgap="10" vgap="10">
-                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-                            <Label text="GST Default Percentage (%):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                            <TextField fx:id="gstPercentageField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                            <Label text="Enable GST:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                            <CheckBox fx:id="gstEnabledCheck" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                            <Button text="Save Tax Settings" onAction="#onSaveTaxSettings" styleClass="btn-primary"
-                                    GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                        </GridPane>
-                    </content>
-                </Tab>
-
-                <!-- Receipt Tab -->
-                <Tab text="Receipt Customization">
-                    <content>
-                        <GridPane hgap="10" vgap="10">
-                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-                            <columnConstraints>
-                                <ColumnConstraints minWidth="120" prefWidth="150" />
-                                <ColumnConstraints hgrow="ALWAYS" />
-                            </columnConstraints>
-
-                            <Label text="Receipt Header:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                            <TextArea fx:id="receiptHeaderField" prefRowCount="3" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                            <Label text="Receipt Footer:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                            <TextArea fx:id="receiptFooterField" prefRowCount="3" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                            <Label text="Options:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                            <VBox spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="1">
-                                <CheckBox fx:id="showLogoCheck" text="Show Logo on Receipt"/>
-                                <CheckBox fx:id="showGstCheck" text="Show GST on Receipt"/>
-                                <CheckBox fx:id="showCashierCheck" text="Show Cashier on Receipt"/>
+                            <VBox spacing="6">
+                                <Label text="Physical Address" styleClass="form-label"/>
+                                <TextField fx:id="addressField" promptText="Full store address..."/>
                             </VBox>
 
-                            <Button text="Save Receipt Settings" onAction="#onSaveStoreSettings" styleClass="btn-primary"
-                                    GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                        </GridPane>
-                    </content>
-                </Tab>
+                            <HBox spacing="16">
+                                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                    <Label text="Contact Phone" styleClass="form-label"/>
+                                    <TextField fx:id="phoneField" promptText="+91 98765 43210"/>
+                                </VBox>
+                                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                    <Label text="Store Email" styleClass="form-label"/>
+                                    <TextField fx:id="emailField" promptText="contact@smartmart.com"/>
+                                </VBox>
+                            </HBox>
 
-                <!-- Theme Tab -->
-                <Tab text="Theme Settings">
-                    <content>
-                        <VBox spacing="15">
-                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-                            <Label text="Choose Application Theme:" style="-fx-font-weight: bold;"/>
-                            <fx:define>
-                                <ToggleGroup fx:id="themeGroup"/>
-                            </fx:define>
-                            <RadioButton fx:id="lightThemeRadio" text="Light Theme" toggleGroup="$themeGroup" selected="true"/>
-                            <RadioButton fx:id="darkThemeRadio" text="Dark Theme" toggleGroup="$themeGroup"/>
-                            <Button text="Apply Theme" onAction="#onApplyTheme" styleClass="btn-primary"/>
-                        </VBox>
-                    </content>
-                </Tab>
+                            <Separator style="-fx-padding: 6 0;"/>
 
-                <!-- Backup Tab -->
-                <Tab text="Database Backup">
-                    <content>
-                        <VBox spacing="15">
-                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-                            <Label text="Database Backup &amp; Recovery" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
-                            <Label fx:id="backupStatusLabel" text="Status: Ready" styleClass="label-muted"/>
-                            <HBox spacing="15">
-                                <Button text="Backup Database" onAction="#onBackupDatabase" styleClass="btn-success"/>
-                                <Button text="Restore Database" onAction="#onRestoreDatabase" styleClass="btn-danger"/>
+                            <HBox alignment="CENTER_RIGHT">
+                                <Button text="💾 Save Store Settings" onAction="#onSaveStoreSettings" styleClass="btn-primary" style="-fx-padding: 8 20;"/>
                             </HBox>
                         </VBox>
-                    </content>
-                </Tab>
+                    </Tab>
 
-                <!-- Audit Log Tab -->
-                <Tab text="System Audit Log">
-                    <content>
-                        <VBox spacing="10">
-                            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-                            <HBox spacing="10" alignment="CENTER_LEFT">
-                                <Label text="User:"/>
-                                <TextField fx:id="auditUserField" prefWidth="120" promptText="Filter User"/>
-                                <Label text="Action:"/>
-                                <TextField fx:id="auditActionField" prefWidth="120" promptText="Filter Action"/>
-                                <Label text="Date:"/>
-                                <DatePicker fx:id="auditDatePicker"/>
-                                <Button text="Search" onAction="#onSearchAuditLogs" styleClass="btn-primary"/>
-                                <Button text="Refresh" onAction="#onRefreshAuditLogs" styleClass="btn-secondary"/>
+                    <!-- Tab 2: GST & Taxes -->
+                    <Tab text="💰 Tax &amp; GST">
+                        <VBox spacing="14" style="-fx-padding: 16;">
+                            <Label text="Tax Calculation Settings" styleClass="card-header-title"/>
+
+                            <HBox spacing="16" alignment="CENTER_LEFT">
+                                <VBox spacing="6" prefWidth="250">
+                                    <Label text="Default GST Percentage (%)" styleClass="form-label"/>
+                                    <TextField fx:id="gstPercentageField" promptText="18.0"/>
+                                </VBox>
+                                <CheckBox fx:id="gstEnabledCheck" text="Enable GST Tax Billing on Receipts" style="-fx-font-weight: bold;"/>
                             </HBox>
-                            <TableView fx:id="auditTable" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn text="Timestamp" prefWidth="150">
-                                        <cellValueFactory><javafx.scene.control.cell.PropertyValueFactory property="timestamp"/></cellValueFactory>
-                                    </TableColumn>
-                                    <TableColumn text="User" prefWidth="120">
-                                        <cellValueFactory><javafx.scene.control.cell.PropertyValueFactory property="username"/></cellValueFactory>
-                                    </TableColumn>
-                                    <TableColumn text="Action" prefWidth="150">
-                                        <cellValueFactory><javafx.scene.control.cell.PropertyValueFactory property="action"/></cellValueFactory>
-                                    </TableColumn>
-                                    <TableColumn text="Details" prefWidth="300">
-                                        <cellValueFactory><javafx.scene.control.cell.PropertyValueFactory property="details"/></cellValueFactory>
-                                    </TableColumn>
-                                </columns>
+
+                            <Separator style="-fx-padding: 6 0;"/>
+
+                            <HBox alignment="CENTER_RIGHT">
+                                <Button text="💾 Save Tax Settings" onAction="#onSaveTaxSettings" styleClass="btn-primary" style="-fx-padding: 8 20;"/>
+                            </HBox>
+                        </VBox>
+                    </Tab>
+
+                    <!-- Tab 3: Receipt Formatting -->
+                    <Tab text="🧾 Receipt Template">
+                        <VBox spacing="14" style="-fx-padding: 16;">
+                            <Label text="Thermal Receipt Printer Configuration" styleClass="card-header-title"/>
+
+                            <VBox spacing="6">
+                                <Label text="Receipt Header Text (Welcome Message / Tagline)" styleClass="form-label"/>
+                                <TextArea fx:id="receiptHeaderField" promptText="e.g. Welcome to SmartMart Supermarket!" prefRowCount="2"/>
+                            </VBox>
+
+                            <VBox spacing="6">
+                                <Label text="Receipt Footer Text (Return Policy / Thank You)" styleClass="form-label"/>
+                                <TextArea fx:id="receiptFooterField" promptText="e.g. Thank you for shopping with us! No return without receipt." prefRowCount="2"/>
+                            </VBox>
+
+                            <HBox spacing="20">
+                                <CheckBox fx:id="showLogoCheck" text="Print Store Header"/>
+                                <CheckBox fx:id="showGstCheck" text="Print Tax Breakdown"/>
+                                <CheckBox fx:id="showCashierCheck" text="Print Cashier Name"/>
+                            </HBox>
+
+                            <Separator style="-fx-padding: 6 0;"/>
+
+                            <HBox alignment="CENTER_RIGHT">
+                                <Button text="💾 Save Receipt Settings" onAction="#onSaveStoreSettings" styleClass="btn-primary" style="-fx-padding: 8 20;"/>
+                            </HBox>
+                        </VBox>
+                    </Tab>
+
+                    <!-- Tab 4: Database Backup -->
+                    <Tab text="💾 Database Backup">
+                        <VBox spacing="14" style="-fx-padding: 16;">
+                            <Label text="System Backup &amp; Restore" styleClass="card-header-title"/>
+
+                            <VBox spacing="6" style="-fx-background-color: #f8fafc; -fx-padding: 14; -fx-background-radius: 8px;">
+                                <Label text="Database Status:" styleClass="form-label"/>
+                                <Label fx:id="backupStatusLabel" text="MySQL Database (smartmart_pos) Connected &amp; Operational." style="-fx-font-weight: bold; -fx-text-fill: #166534;"/>
+                            </VBox>
+
+                            <HBox spacing="12">
+                                <Button text="📦 Create Manual Backup Snapshot" onAction="#onTriggerBackup" styleClass="btn-primary"/>
+                                <Button text="📥 Restore Database Snapshot" onAction="#onRestoreBackup" styleClass="btn-secondary"/>
+                            </HBox>
+                        </VBox>
+                    </Tab>
+
+                    <!-- Tab 5: Security Audit Logs -->
+                    <Tab text="🛡️ System Audit Logs">
+                        <VBox spacing="12" style="-fx-padding: 16;">
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="Activity Audit Log Trail" styleClass="card-header-title"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <TextField fx:id="auditUserField" promptText="Filter by username" prefWidth="140"/>
+                                <TextField fx:id="auditActionField" promptText="Filter by action" prefWidth="140"/>
+                                <DatePicker fx:id="auditDatePicker" promptText="Filter date" prefWidth="130"/>
+                                <Button text="🔍 Filter" onAction="#onSearchAuditLogs" styleClass="btn-secondary"/>
+                            </HBox>
+
+                            <TableView fx:id="auditTable" prefHeight="350">
+                                <placeholder><Label text="No audit logs available."/></placeholder>
                             </TableView>
                         </VBox>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
+                    </Tab>
+                </TabPane>
+            </VBox>
+        </ScrollPane>
     </center>
+
+    <!-- ── FOOTER BAR ──────────────────────────────────────────────────── -->
+    <bottom>
+        <HBox styleClass="footer-bar" alignment="CENTER_LEFT">
+            <Label text="SmartMart POS v1.0.0 — Settings Module" styleClass="footer-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="© 2026 SmartMart POS. All rights reserved." styleClass="footer-text"/>
+        </HBox>
+    </bottom>
 </BorderPane>
